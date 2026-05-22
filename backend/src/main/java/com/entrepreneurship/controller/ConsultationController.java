@@ -1,0 +1,72 @@
+package com.entrepreneurship.controller;
+
+import com.entrepreneurship.common.PageResult;
+import com.entrepreneurship.common.Result;
+import com.entrepreneurship.entity.Consultation;
+import com.entrepreneurship.service.ConsultationService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/consultation")
+public class ConsultationController {
+
+    private final ConsultationService consultationService;
+
+    public ConsultationController(ConsultationService consultationService) {
+        this.consultationService = consultationService;
+    }
+
+    @PostMapping
+    public Result<Consultation> create(@RequestBody Consultation consultation, HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        consultation.setUserId(userId);
+        try {
+            return Result.ok(consultationService.create(consultation));
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}")
+    public Result<Consultation> update(@PathVariable Long id, @RequestBody Consultation consultation) {
+        return Result.ok(consultationService.update(id, consultation));
+    }
+
+    @DeleteMapping("/{id}")
+    public Result<?> delete(@PathVariable Long id) {
+        consultationService.delete(id);
+        return Result.ok("删除成功");
+    }
+
+    @GetMapping("/{id}")
+    public Result<Consultation> getById(@PathVariable Long id) {
+        return Result.ok(consultationService.getById(id));
+    }
+
+    @GetMapping("/my")
+    public Result<PageResult<Consultation>> listMy(HttpServletRequest request,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Long userId = (Long) request.getAttribute("userId");
+        return Result.ok(consultationService.listByUser(userId, page, size));
+    }
+
+    @GetMapping("/mentor/{mentorId}")
+    public Result<PageResult<Consultation>> listByMentor(@PathVariable Long mentorId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return Result.ok(consultationService.listByMentor(mentorId, page, size));
+    }
+
+    @PutMapping("/{id}/status")
+    public Result<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, Object> params) {
+        String status = (String) params.get("status");
+        String feedback = (String) params.get("feedback");
+        Integer rating = params.get("rating") != null ? ((Number) params.get("rating")).intValue() : null;
+        consultationService.updateStatus(id, status, feedback, rating);
+        return Result.ok("更新成功");
+    }
+}

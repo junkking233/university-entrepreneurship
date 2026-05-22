@@ -1,0 +1,84 @@
+package com.entrepreneurship.controller;
+
+import com.entrepreneurship.common.PageResult;
+import com.entrepreneurship.common.Result;
+import com.entrepreneurship.entity.Roadshow;
+import com.entrepreneurship.entity.RoadshowProject;
+import com.entrepreneurship.service.ProjectService;
+import com.entrepreneurship.service.RoadshowService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/roadshow")
+public class RoadshowController {
+
+    private final RoadshowService roadshowService;
+    private final ProjectService projectService;
+
+    public RoadshowController(RoadshowService roadshowService, ProjectService projectService) {
+        this.roadshowService = roadshowService;
+        this.projectService = projectService;
+    }
+
+    @PostMapping("/create")
+    public Result<Roadshow> create(@RequestBody Roadshow roadshow, HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        Roadshow result = roadshowService.create(roadshow);
+        return Result.ok(result);
+    }
+
+    @GetMapping("/list")
+    public Result<PageResult<Roadshow>> list(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String status) {
+        PageResult<Roadshow> result = roadshowService.list(page, size, status);
+        return Result.ok(result);
+    }
+
+    @GetMapping("/{id}")
+    public Result<Map<String, Object>> getById(@PathVariable Long id) {
+        Roadshow roadshow = roadshowService.getById(id);
+        PageResult<RoadshowProject> projects = roadshowService.listProjects(id, 1, 100);
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("roadshow", roadshow);
+        result.put("projects", projects);
+        return Result.ok(result);
+    }
+
+    @PutMapping("/{id}")
+    public Result<Roadshow> update(@PathVariable Long id, @RequestBody Roadshow roadshow) {
+        Roadshow result = roadshowService.update(id, roadshow);
+        return Result.ok(result);
+    }
+
+    @DeleteMapping("/{id}")
+    public Result<?> delete(@PathVariable Long id) {
+        roadshowService.delete(id);
+        return Result.ok("删除成功");
+    }
+
+    @PutMapping("/{id}/status")
+    public Result<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        Roadshow roadshow = roadshowService.getById(id);
+        roadshow.setStatus(body.get("status"));
+        roadshowService.update(id, roadshow);
+        return Result.ok("状态更新成功");
+    }
+
+    @PostMapping("/{id}/projects")
+    public Result<RoadshowProject> addProject(@PathVariable Long id, @RequestBody RoadshowProject roadshowProject) {
+        roadshowProject.setRoadshowId(id);
+        RoadshowProject result = roadshowService.addProject(roadshowProject);
+        return Result.ok(result);
+    }
+
+    @DeleteMapping("/{id}/projects/{projectId}")
+    public Result<?> removeProject(@PathVariable Long id, @PathVariable Long projectId) {
+        roadshowService.removeProject(id, projectId);
+        return Result.ok("移除成功");
+    }
+}

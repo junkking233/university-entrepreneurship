@@ -1,0 +1,82 @@
+package com.entrepreneurship.controller;
+
+import com.entrepreneurship.common.PageResult;
+import com.entrepreneurship.common.Result;
+import com.entrepreneurship.entity.Investment;
+import com.entrepreneurship.entity.InvestorInfo;
+import com.entrepreneurship.service.InvestmentService;
+import com.entrepreneurship.service.InvestorService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/investment")
+public class InvestmentController {
+
+    private final InvestmentService investmentService;
+    private final InvestorService investorService;
+
+    public InvestmentController(InvestmentService investmentService, InvestorService investorService) {
+        this.investmentService = investmentService;
+        this.investorService = investorService;
+    }
+
+    @PostMapping
+    public Result<Investment> create(@RequestBody Investment investment, HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        InvestorInfo investor = investorService.getByUserId(userId);
+        if (investor == null) {
+            return Result.error("只有投资人可以进行投资");
+        }
+        investment.setInvestorId(investor.getId());
+        try {
+            return Result.ok(investmentService.create(investment));
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}")
+    public Result<Investment> getById(@PathVariable Long id) {
+        return Result.ok(investmentService.getById(id));
+    }
+
+    @GetMapping("/my")
+    public Result<PageResult<Investment>> listMy(HttpServletRequest request,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Long userId = (Long) request.getAttribute("userId");
+        InvestorInfo investor = investorService.getByUserId(userId);
+        if (investor == null) {
+            return Result.error("不是投资人");
+        }
+        return Result.ok(investmentService.listByInvestor(investor.getId(), page, size));
+    }
+
+    @GetMapping("/project/{projectId}")
+    public Result<PageResult<Investment>> listByProject(@PathVariable Long projectId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return Result.ok(investmentService.listByProject(projectId, page, size));
+    }
+
+    @GetMapping("/list")
+    public Result<PageResult<Investment>> listAll(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return Result.ok(investmentService.listAll(page, size));
+    }
+
+    @GetMapping("/investor/profile")
+    public Result<InvestorInfo> getInvestorProfile(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        return Result.ok(investorService.getByUserId(userId));
+    }
+
+    @PutMapping("/investor/profile")
+    public Result<?> updateInvestorProfile(@RequestBody InvestorInfo investorInfo, HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        investorService.updateInvestorInfo(userId, investorInfo);
+        return Result.ok("更新成功");
+    }
+}

@@ -1,0 +1,75 @@
+package com.entrepreneurship.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.entrepreneurship.common.PageResult;
+import com.entrepreneurship.entity.Message;
+import com.entrepreneurship.mapper.MessageMapper;
+import com.entrepreneurship.service.MessageService;
+import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
+
+@Service
+public class MessageServiceImpl implements MessageService {
+
+    private final MessageMapper messageMapper;
+
+    public MessageServiceImpl(MessageMapper messageMapper) {
+        this.messageMapper = messageMapper;
+    }
+
+    @Override
+    public Message send(Message message) {
+        message.setIsRead(0);
+        message.setCreateTime(LocalDateTime.now());
+        messageMapper.insert(message);
+        return message;
+    }
+
+    @Override
+    public PageResult<Message> listReceived(Long userId, int page, int size) {
+        LambdaQueryWrapper<Message> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Message::getToUserId, userId);
+        wrapper.orderByDesc(Message::getCreateTime);
+        Page<Message> mpPage = new Page<>(page, size);
+        Page<Message> result = messageMapper.selectPage(mpPage, wrapper);
+        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
+    }
+
+    @Override
+    public PageResult<Message> listSent(Long userId, int page, int size) {
+        LambdaQueryWrapper<Message> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Message::getFromUserId, userId);
+        wrapper.orderByDesc(Message::getCreateTime);
+        Page<Message> mpPage = new Page<>(page, size);
+        Page<Message> result = messageMapper.selectPage(mpPage, wrapper);
+        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
+    }
+
+    @Override
+    public Message getById(Long id) {
+        return messageMapper.selectById(id);
+    }
+
+    @Override
+    public void markAsRead(Long id) {
+        Message message = messageMapper.selectById(id);
+        if (message != null) {
+            message.setIsRead(1);
+            messageMapper.updateById(message);
+        }
+    }
+
+    @Override
+    public int getUnreadCount(Long userId) {
+        LambdaQueryWrapper<Message> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Message::getToUserId, userId);
+        wrapper.eq(Message::getIsRead, 0);
+        return messageMapper.selectCount(wrapper).intValue();
+    }
+
+    @Override
+    public void delete(Long id) {
+        messageMapper.deleteById(id);
+    }
+}
