@@ -2,6 +2,7 @@ package com.entrepreneurship.controller;
 
 import com.entrepreneurship.common.PageResult;
 import com.entrepreneurship.common.Result;
+import com.entrepreneurship.common.SecurityInputUtil;
 import com.entrepreneurship.dto.ProjectDTO;
 import com.entrepreneurship.entity.Project;
 import com.entrepreneurship.service.ProjectService;
@@ -21,32 +22,29 @@ public class ProjectController {
     @PostMapping
     public Result<Project> create(@RequestBody ProjectDTO projectDTO, HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
-        try {
-            Project project = projectService.create(userId, projectDTO);
-            return Result.ok(project);
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
+        SecurityInputUtil.sanitize(projectDTO);
+        Project project = projectService.create(userId, projectDTO);
+        return Result.ok(project);
     }
 
     @PutMapping("/{id}")
     public Result<Project> update(@PathVariable Long id, @RequestBody ProjectDTO projectDTO) {
-        try {
-            Project project = projectService.update(id, projectDTO);
-            return Result.ok(project);
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
+        SecurityInputUtil.requirePositiveId(id, "项目ID");
+        SecurityInputUtil.sanitizeOptional(projectDTO);
+        Project project = projectService.update(id, projectDTO);
+        return Result.ok(project);
     }
 
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable Long id) {
+        SecurityInputUtil.requirePositiveId(id, "项目ID");
         projectService.delete(id);
         return Result.ok("删除成功");
     }
 
     @GetMapping("/{id}")
     public Result<Project> getById(@PathVariable Long id) {
+        SecurityInputUtil.requirePositiveId(id, "项目ID");
         Project project = projectService.getById(id);
         return Result.ok(project);
     }
@@ -59,7 +57,13 @@ public class ProjectController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String field,
             @RequestParam(required = false) String status) {
-        PageResult<Project> result = projectService.list(page, size, keyword, category, field, status);
+        PageResult<Project> result = projectService.list(
+                SecurityInputUtil.page(page),
+                SecurityInputUtil.size(size),
+                SecurityInputUtil.cleanText(keyword, 100, "关键词"),
+                SecurityInputUtil.cleanText(category, 50, "项目分类"),
+                SecurityInputUtil.cleanText(field, 50, "项目领域"),
+                SecurityInputUtil.cleanStatus(status));
         return Result.ok(result);
     }
 
@@ -67,7 +71,7 @@ public class ProjectController {
     public Result<PageResult<Project>> listPublic(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-        PageResult<Project> result = projectService.listPublic(page, size);
+        PageResult<Project> result = projectService.listPublic(SecurityInputUtil.page(page), SecurityInputUtil.size(size));
         return Result.ok(result);
     }
 
@@ -77,7 +81,7 @@ public class ProjectController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
         Long userId = (Long) request.getAttribute("userId");
-        PageResult<Project> result = projectService.listByOwner(userId, page, size);
+        PageResult<Project> result = projectService.listByOwner(userId, SecurityInputUtil.page(page), SecurityInputUtil.size(size));
         return Result.ok(result);
     }
 }

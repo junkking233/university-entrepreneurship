@@ -2,6 +2,7 @@ package com.entrepreneurship.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.entrepreneurship.common.BusinessException;
 import com.entrepreneurship.common.PageResult;
 import com.entrepreneurship.dto.ProjectDTO;
 import com.entrepreneurship.entity.Project;
@@ -46,7 +47,7 @@ public class ProjectServiceImpl implements ProjectService {
     public Project update(Long id, ProjectDTO projectDTO) {
         Project project = projectMapper.selectById(id);
         if (project == null) {
-            throw new RuntimeException("项目不存在");
+            throw new BusinessException("项目不存在");
         }
         if (projectDTO.getName() != null) project.setName(projectDTO.getName());
         if (projectDTO.getDescription() != null) project.setDescription(projectDTO.getDescription());

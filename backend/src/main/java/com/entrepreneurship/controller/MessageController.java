@@ -2,6 +2,7 @@ package com.entrepreneurship.controller;
 
 import com.entrepreneurship.common.PageResult;
 import com.entrepreneurship.common.Result;
+import com.entrepreneurship.common.SecurityInputUtil;
 import com.entrepreneurship.entity.Message;
 import com.entrepreneurship.service.MessageService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +25,7 @@ public class MessageController {
     public Result<Message> send(@RequestBody Message message, HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
         message.setFromUserId(userId);
+        SecurityInputUtil.sanitize(message);
         Message result = messageService.send(message);
         return Result.ok(result);
     }
@@ -34,7 +36,7 @@ public class MessageController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
         Long userId = (Long) request.getAttribute("userId");
-        PageResult<Message> result = messageService.listReceived(userId, page, size);
+        PageResult<Message> result = messageService.listReceived(userId, SecurityInputUtil.page(page), SecurityInputUtil.size(size));
         return Result.ok(result);
     }
 
@@ -44,7 +46,7 @@ public class MessageController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
         Long userId = (Long) request.getAttribute("userId");
-        PageResult<Message> result = messageService.listSent(userId, page, size);
+        PageResult<Message> result = messageService.listSent(userId, SecurityInputUtil.page(page), SecurityInputUtil.size(size));
         return Result.ok(result);
     }
 
@@ -59,6 +61,7 @@ public class MessageController {
 
     @PutMapping("/{id}/read")
     public Result<?> markAsRead(@PathVariable Long id) {
+        SecurityInputUtil.requirePositiveId(id, "消息ID");
         messageService.markAsRead(id);
         return Result.ok("标记已读成功");
     }

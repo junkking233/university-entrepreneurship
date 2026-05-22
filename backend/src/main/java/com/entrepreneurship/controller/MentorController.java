@@ -1,6 +1,7 @@
 package com.entrepreneurship.controller;
 
 import com.entrepreneurship.common.Result;
+import com.entrepreneurship.common.SecurityInputUtil;
 import com.entrepreneurship.entity.MentorInfo;
 import com.entrepreneurship.service.MentorService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ public class MentorController {
 
     @GetMapping("/{id}")
     public Result<MentorInfo> getById(@PathVariable Long id) {
+        SecurityInputUtil.requirePositiveId(id, "导师ID");
         return Result.ok(mentorService.getById(id));
     }
 
@@ -37,6 +39,7 @@ public class MentorController {
     @PutMapping("/profile")
     public Result<?> updateProfile(@RequestBody MentorInfo mentorInfo, HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
+        SecurityInputUtil.sanitize(mentorInfo);
         mentorService.updateMentorInfo(userId, mentorInfo);
         return Result.ok("更新成功");
     }

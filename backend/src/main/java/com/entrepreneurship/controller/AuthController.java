@@ -1,6 +1,7 @@
 package com.entrepreneurship.controller;
 
 import com.entrepreneurship.common.Result;
+import com.entrepreneurship.common.SecurityInputUtil;
 import com.entrepreneurship.dto.LoginDTO;
 import com.entrepreneurship.dto.RegisterDTO;
 import com.entrepreneurship.interceptor.LoginInterceptor;
@@ -22,31 +23,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@RequestBody LoginDTO loginDTO) {
-        try {
-            Map<String, Object> result = userService.login(loginDTO);
-            return Result.ok(result);
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
+        SecurityInputUtil.sanitize(loginDTO);
+        Map<String, Object> result = userService.login(loginDTO);
+        return Result.ok(result);
     }
 
     @PostMapping("/register")
     public Result<?> register(@RequestBody RegisterDTO registerDTO) {
-        try {
-            if (registerDTO.getUsername() == null || registerDTO.getUsername().isEmpty()) {
-                return Result.error("用户名不能为空");
-            }
-            if (registerDTO.getPassword() == null || registerDTO.getPassword().isEmpty()) {
-                return Result.error("密码不能为空");
-            }
-            if (registerDTO.getRole() == null || registerDTO.getRole().isEmpty()) {
-                return Result.error("角色不能为空");
-            }
-            userService.register(registerDTO);
-            return Result.ok("注册成功");
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
+        SecurityInputUtil.sanitize(registerDTO);
+        userService.register(registerDTO);
+        return Result.ok("注册成功");
     }
 
     @PostMapping("/logout")

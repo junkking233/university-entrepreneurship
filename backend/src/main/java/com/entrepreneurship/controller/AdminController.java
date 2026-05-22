@@ -1,9 +1,9 @@
 package com.entrepreneurship.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.entrepreneurship.common.PageResult;
 import com.entrepreneurship.common.Result;
+import com.entrepreneurship.common.SecurityInputUtil;
 import com.entrepreneurship.entity.Feedback;
 import com.entrepreneurship.entity.Project;
 import com.entrepreneurship.entity.User;
@@ -13,9 +13,8 @@ import com.entrepreneurship.service.ProjectService;
 import com.entrepreneurship.service.StatisticsService;
 import com.entrepreneurship.service.UserService;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -43,20 +42,26 @@ public class AdminController {
     @GetMapping("/projects/pending")
     public Result<PageResult<Project>> pendingProjects(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        PageResult<Project> result = projectService.list(page, size, null, null, null, "pending");
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+        requireAdmin(request);
+        PageResult<Project> result = projectService.list(SecurityInputUtil.page(page), SecurityInputUtil.size(size), null, null, null, "pending");
         return Result.ok(result);
     }
 
     @PutMapping("/projects/{id}/approve")
-    public Result<?> approveProject(@PathVariable Long id) {
+    public Result<?> approveProject(@PathVariable Long id, HttpServletRequest request) {
+        requireAdmin(request);
+        SecurityInputUtil.requirePositiveId(id, "项目ID");
         projectService.approve(id);
         return Result.ok("审核通过");
     }
 
     @PutMapping("/projects/{id}/reject")
-    public Result<?> rejectProject(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        String reason = body.get("reason");
+    public Result<?> rejectProject(@PathVariable Long id, @RequestBody Map<String, String> body, HttpServletRequest request) {
+        requireAdmin(request);
+        SecurityInputUtil.requirePositiveId(id, "项目ID");
+        String reason = SecurityInputUtil.cleanText(body.get("reason"), 500, "拒绝原因");
         projectService.reject(id, reason);
         return Result.ok("已拒绝");
     }
@@ -64,9 +69,12 @@ public class AdminController {
     @GetMapping("/users")
     public Result<PageResult<User>> users(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Page<User> userPage = new Page<>(page, size);
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+        requireAdmin(request);
+        Page<User> userPage = new Page<>(SecurityInputUtil.page(page), SecurityInputUtil.size(size));
         Page<User> result = userMapper.selectPage(userPage, null);
+        result.getRecords().forEach(user -> user.setPassword(null));
         PageResult<User> pageResult = new PageResult<>();
         pageResult.setTotal(result.getTotal());
         pageResult.setPage(result.getCurrent());
@@ -76,14 +84,23 @@ public class AdminController {
     }
 
     @PutMapping("/users/{id}/status")
-    public Result<?> updateUserStatus(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+    public Result<?> updateUserStatus(@PathVariable Long id, @RequestBody Map<String, Object> body, HttpServletRequest request) {
+        requireAdmin(request);
+        SecurityInputUtil.requirePositiveId(id, "用户ID");
         User user = userMapper.selectById(id);
         if (user == null) {
             return Result.error("用户不存在");
         }
         Object statusObj = body.get("status");
         if (statusObj != null) {
-            user.setStatus(Integer.valueOf(statusObj.toString()));
+            String status = SecurityInputUtil.cleanText(statusObj.toString(), 20, "状态");
+            if ("active".equals(status) || "1".equals(status)) {
+                user.setStatus(1);
+            } else if ("disabled".equals(status) || "inactive".equals(status) || "0".equals(status)) {
+                user.setStatus(0);
+            } else {
+                return Result.error(400, "状态不合法");
+            }
         }
         userMapper.updateById(user);
         return Result.ok("状态更新成功");
@@ -92,20 +109,31 @@ public class AdminController {
     @GetMapping("/feedbacks")
     public Result<PageResult<Feedback>> feedbacks(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        PageResult<Feedback> result = feedbackService.listAll(page, size, null);
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+        requireAdmin(request);
+        PageResult<Feedback> result = feedbackService.listAll(SecurityInputUtil.page(page), SecurityInputUtil.size(size), null);
         return Result.ok(result);
     }
 
     @PutMapping("/feedbacks/{id}/status")
-    public Result<?> updateFeedbackStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        feedbackService.updateStatus(id, body.get("status"));
+    public Result<?> updateFeedbackStatus(@PathVariable Long id, @RequestBody Map<String, String> body, HttpServletRequest request) {
+        requireAdmin(request);
+        SecurityInputUtil.requirePositiveId(id, "反馈ID");
+        feedbackService.updateStatus(id, SecurityInputUtil.cleanStatus(body.get("status")));
         return Result.ok("处理成功");
     }
 
     @GetMapping("/statistics/overview")
-    public Result<Map<String, Object>> overview() {
+    public Result<Map<String, Object>> overview(HttpServletRequest request) {
+        requireAdmin(request);
         Map<String, Object> stats = statisticsService.getDashboardStats();
         return Result.ok(stats);
+    }
+
+    private void requireAdmin(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        User user = userService.getById(userId);
+        SecurityInputUtil.requireRole(user, "admin");
     }
 }
