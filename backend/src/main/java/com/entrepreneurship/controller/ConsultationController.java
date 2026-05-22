@@ -2,6 +2,7 @@ package com.entrepreneurship.controller;
 
 import com.entrepreneurship.common.PageResult;
 import com.entrepreneurship.common.Result;
+import com.entrepreneurship.common.SecurityInputUtil;
 import com.entrepreneurship.entity.Consultation;
 import com.entrepreneurship.service.ConsultationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,26 +24,27 @@ public class ConsultationController {
     public Result<Consultation> create(@RequestBody Consultation consultation, HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
         consultation.setUserId(userId);
-        try {
-            return Result.ok(consultationService.create(consultation));
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
+        SecurityInputUtil.sanitize(consultation);
+        return Result.ok(consultationService.create(consultation));
     }
 
     @PutMapping("/{id}")
     public Result<Consultation> update(@PathVariable Long id, @RequestBody Consultation consultation) {
+        SecurityInputUtil.requirePositiveId(id, "咨询ID");
+        SecurityInputUtil.sanitizeConsultationOptional(consultation);
         return Result.ok(consultationService.update(id, consultation));
     }
 
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable Long id) {
+        SecurityInputUtil.requirePositiveId(id, "咨询ID");
         consultationService.delete(id);
         return Result.ok("删除成功");
     }
 
     @GetMapping("/{id}")
     public Result<Consultation> getById(@PathVariable Long id) {
+        SecurityInputUtil.requirePositiveId(id, "咨询ID");
         return Result.ok(consultationService.getById(id));
     }
 
@@ -51,21 +53,26 @@ public class ConsultationController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
         Long userId = (Long) request.getAttribute("userId");
-        return Result.ok(consultationService.listByUser(userId, page, size));
+        return Result.ok(consultationService.listByUser(userId, SecurityInputUtil.page(page), SecurityInputUtil.size(size)));
     }
 
     @GetMapping("/mentor/{mentorId}")
     public Result<PageResult<Consultation>> listByMentor(@PathVariable Long mentorId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return Result.ok(consultationService.listByMentor(mentorId, page, size));
+        SecurityInputUtil.requirePositiveId(mentorId, "导师ID");
+        return Result.ok(consultationService.listByMentor(mentorId, SecurityInputUtil.page(page), SecurityInputUtil.size(size)));
     }
 
     @PutMapping("/{id}/status")
     public Result<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, Object> params) {
-        String status = (String) params.get("status");
-        String feedback = (String) params.get("feedback");
+        SecurityInputUtil.requirePositiveId(id, "咨询ID");
+        String status = SecurityInputUtil.cleanStatus((String) params.get("status"));
+        String feedback = SecurityInputUtil.cleanText((String) params.get("feedback"), 2000, "反馈内容");
         Integer rating = params.get("rating") != null ? ((Number) params.get("rating")).intValue() : null;
+        if (rating != null && (rating < 1 || rating > 5)) {
+            return Result.error(400, "评分必须为1-5");
+        }
         consultationService.updateStatus(id, status, feedback, rating);
         return Result.ok("更新成功");
     }

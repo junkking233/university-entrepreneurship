@@ -1,9 +1,13 @@
 package com.entrepreneurship.controller;
 
 import com.entrepreneurship.common.Result;
+import com.entrepreneurship.common.SecurityInputUtil;
 import com.entrepreneurship.entity.Investment;
+import com.entrepreneurship.entity.User;
 import com.entrepreneurship.mapper.InvestmentMapper;
 import com.entrepreneurship.service.StatisticsService;
+import com.entrepreneurship.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -15,38 +19,45 @@ public class StatisticsController {
 
     private final StatisticsService statisticsService;
     private final InvestmentMapper investmentMapper;
+    private final UserService userService;
 
-    public StatisticsController(StatisticsService statisticsService, InvestmentMapper investmentMapper) {
+    public StatisticsController(StatisticsService statisticsService, InvestmentMapper investmentMapper, UserService userService) {
         this.statisticsService = statisticsService;
         this.investmentMapper = investmentMapper;
+        this.userService = userService;
     }
 
     @GetMapping("/dashboard")
-    public Result<Map<String, Object>> dashboard() {
+    public Result<Map<String, Object>> dashboard(HttpServletRequest request) {
+        requireAdmin(request);
         Map<String, Object> stats = statisticsService.getDashboardStats();
         return Result.ok(stats);
     }
 
     @GetMapping("/projects/category")
-    public Result<List<Map<String, Object>>> projectCategoryDistribution() {
+    public Result<List<Map<String, Object>>> projectCategoryDistribution(HttpServletRequest request) {
+        requireAdmin(request);
         List<Map<String, Object>> data = statisticsService.getProjectCategoryDistribution();
         return Result.ok(data);
     }
 
     @GetMapping("/projects/monthly")
-    public Result<List<Map<String, Object>>> monthlyProjectTrend() {
+    public Result<List<Map<String, Object>>> monthlyProjectTrend(HttpServletRequest request) {
+        requireAdmin(request);
         List<Map<String, Object>> data = statisticsService.getMonthlyProjectTrend();
         return Result.ok(data);
     }
 
     @GetMapping("/users/role")
-    public Result<List<Map<String, Object>>> userRoleDistribution() {
+    public Result<List<Map<String, Object>>> userRoleDistribution(HttpServletRequest request) {
+        requireAdmin(request);
         List<Map<String, Object>> data = statisticsService.getUserRoleDistribution();
         return Result.ok(data);
     }
 
     @GetMapping("/investments/monthly")
-    public Result<List<Map<String, Object>>> monthlyInvestmentTrend() {
+    public Result<List<Map<String, Object>>> monthlyInvestmentTrend(HttpServletRequest request) {
+        requireAdmin(request);
         List<Investment> investments = investmentMapper.selectList(null);
         Map<String, BigDecimal> monthlyAmount = new TreeMap<>();
         Map<String, Integer> monthlyCount = new TreeMap<>();
@@ -68,5 +79,11 @@ public class StatisticsController {
             result.add(item);
         }
         return Result.ok(result);
+    }
+
+    private void requireAdmin(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        User user = userService.getById(userId);
+        SecurityInputUtil.requireRole(user, "admin");
     }
 }
