@@ -49,8 +49,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-empty v-if="!loading && investmentList.length === 0" description="暂无投资记录" />
 
-      <div class="pagination-wrapper">
+      <div class="pagination-wrapper" v-if="pagination.total > 0">
         <el-pagination
           v-model:current-page="pagination.page"
           v-model:page-size="pagination.pageSize"
@@ -122,11 +123,8 @@ async function fetchList() {
     investmentList.value = res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
-    investmentList.value = [
-      { id: 1, projectId: 1, projectTitle: '智能校园助手', amount: 50, equity: 15, status: 'active', investDate: '2024-05-20', note: '首轮投资' },
-      { id: 2, projectId: 2, projectTitle: '绿色循环快递盒', amount: 100, equity: 20, status: 'pending', investDate: '2024-05-18', note: '待签署协议' }
-    ]
-    pagination.total = 2
+    investmentList.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }

@@ -2,7 +2,7 @@
   <div class="project-detail-page">
     <el-card v-loading="loading">
       <template #header>
-        <div class="detail-header">
+        <div class="detail-header" v-if="project.id">
           <el-button type="primary" link @click="$router.back()">
             <el-icon><ArrowLeft /></el-icon> 返回
           </el-button>
@@ -10,7 +10,7 @@
         </div>
       </template>
 
-      <el-descriptions :column="2" border>
+      <el-descriptions v-if="project.id" :column="2" border>
         <el-descriptions-item label="项目分类">
           <el-tag size="small">{{ project.category }}</el-tag>
         </el-descriptions-item>
@@ -24,9 +24,10 @@
           <span style="color:#e6a23c;font-weight:bold;">{{ project.fundingTarget }}万</span>
         </el-descriptions-item>
         <el-descriptions-item label="发布时间">{{ project.createdAt }}</el-descriptions-item>
-        <el-descriptions-item label="团队规模">{{ project.teamSize || '3-5人' }}</el-descriptions-item>
+        <el-descriptions-item label="团队规模">{{ project.teamSize || '-' }}</el-descriptions-item>
       </el-descriptions>
 
+      <template v-if="project.id">
       <el-divider />
 
       <div class="detail-section">
@@ -36,12 +37,12 @@
 
       <div class="detail-section">
         <h3>商业计划</h3>
-        <p>{{ project.businessPlan || '该项目旨在通过创新技术解决行业痛点，具有广阔的市场前景和发展潜力。' }}</p>
+        <p>{{ project.businessPlan || '-' }}</p>
       </div>
 
       <div class="detail-section">
         <h3>团队介绍</h3>
-        <p>{{ project.teamIntro || '团队由来自多个专业领域的优秀大学生组成，具备扎实的技术功底和丰富的实践经验。' }}</p>
+        <p>{{ project.teamIntro || '-' }}</p>
       </div>
 
       <div class="detail-actions">
@@ -52,6 +53,8 @@
           <el-icon><ChatDotRound /></el-icon> 咨询导师
         </el-button>
       </div>
+      </template>
+      <el-empty v-else-if="!loading" description="暂无项目详情" />
     </el-card>
   </div>
 </template>
@@ -67,7 +70,7 @@ const route = useRoute()
 const loading = ref(false)
 
 const project = ref({
-  id: 1,
+  id: '',
   title: '',
   category: '',
   status: '',
@@ -114,19 +117,18 @@ async function fetchDetail() {
     const res = await getProjectDetail(route.params.id)
     project.value = res.data || project.value
   } catch {
-    // 使用模拟数据
     project.value = {
-      id: route.params.id,
-      title: '智能校园助手',
-      category: '人工智能',
-      status: 'funding',
-      founder: '张三',
-      fundingTarget: 50,
-      createdAt: '2024-05-20',
-      teamSize: '5人',
-      description: '基于AI的校园服务一体化平台，提供智能问答、课表管理、校园导航等功能，致力于打造智慧校园生态系统。',
-      businessPlan: '目标市场为全国高校，预计第一年覆盖50所高校，第二年实现盈利。',
-      teamIntro: '核心团队由来自计算机学院、管理学院和经济学院的5名优秀学生组成，具备AI开发、产品设计和市场推广能力。'
+      id: '',
+      title: '',
+      category: '',
+      status: '',
+      founder: '',
+      fundingTarget: 0,
+      createdAt: '',
+      description: '',
+      businessPlan: '',
+      teamIntro: '',
+      teamSize: ''
     }
   } finally {
     loading.value = false

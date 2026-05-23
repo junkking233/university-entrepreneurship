@@ -90,10 +90,10 @@ import { User, FolderOpened, Clock, ChatLineSquare } from '@element-plus/icons-v
 import { getStatistics, getProjectStats, getUserStats, getMonthlyTrend } from '@/api/statistics'
 
 const stats = reactive({
-  totalUsers: 1250,
-  totalProjects: 480,
-  pendingAudit: 15,
-  pendingFeedback: 8
+  totalUsers: 0,
+  totalProjects: 0,
+  pendingAudit: 0,
+  pendingFeedback: 0
 })
 
 const pieChartRef = ref(null)
@@ -103,6 +103,13 @@ const barChartRef = ref(null)
 let pieChart = null
 let userPieChart = null
 let barChart = null
+const projectCategoryData = ref([])
+const userRoleData = ref([])
+const monthlyTrendData = ref({
+  months: [],
+  created: [],
+  approved: []
+})
 
 function initPieChart() {
   if (!pieChartRef.value) return
@@ -125,15 +132,7 @@ function initPieChart() {
         show: true,
         formatter: '{b}: {c}'
       },
-      data: [
-        { value: 120, name: '人工智能' },
-        { value: 95, name: '环保科技' },
-        { value: 80, name: '教育科技' },
-        { value: 65, name: '医疗健康' },
-        { value: 55, name: '电子商务' },
-        { value: 45, name: '金融科技' },
-        { value: 20, name: '其他' }
-      ]
+      data: projectCategoryData.value
     }]
   })
 }
@@ -159,12 +158,7 @@ function initUserPieChart() {
         show: true,
         formatter: '{b}: {c}'
       },
-      data: [
-        { value: 850, name: '创业者' },
-        { value: 180, name: '导师' },
-        { value: 120, name: '投资者' },
-        { value: 100, name: '管理员' }
-      ]
+      data: userRoleData.value
     }]
   })
 }
@@ -177,7 +171,7 @@ function initBarChart() {
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
     xAxis: {
       type: 'category',
-      data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+      data: monthlyTrendData.value.months
     },
     yAxis: {
       type: 'value',
@@ -187,7 +181,7 @@ function initBarChart() {
       {
         name: '新增项目',
         type: 'bar',
-        data: [15, 22, 30, 28, 35, 42, 38, 45, 50, 48, 52, 55],
+        data: monthlyTrendData.value.created,
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             { offset: 0, color: '#409eff' },
@@ -199,7 +193,7 @@ function initBarChart() {
       {
         name: '通过审核',
         type: 'bar',
-        data: [10, 18, 25, 22, 30, 38, 32, 40, 45, 42, 48, 50],
+        data: monthlyTrendData.value.approved,
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             { offset: 0, color: '#67c23a' },
@@ -212,13 +206,56 @@ function initBarChart() {
   })
 }
 
+function normalizeChartData(res, nameKeys = ['name', 'label', 'category', 'role'], valueKeys = ['value', 'count', 'total']) {
+  const list = res.data?.list || res.data?.records || res.data || []
+  return list.map((item) => ({
+    name: nameKeys.map((key) => item[key]).find((value) => value !== undefined && value !== null) || '-',
+    value: valueKeys.map((key) => item[key]).find((value) => value !== undefined && value !== null) || 0
+  }))
+}
+
+function normalizeTrendData(res) {
+  const list = res.data?.list || res.data?.records || res.data || []
+  monthlyTrendData.value = {
+    months: list.map((item) => item.month || item.name || item.label || ''),
+    created: list.map((item) => item.created || item.newProjects || item.count || 0),
+    approved: list.map((item) => item.approved || item.approvedProjects || 0)
+  }
+}
+
+async function fetchDashboardData() {
+  const [statsRes, projectStatsRes, userStatsRes, trendRes] = await Promise.allSettled([
+    getStatistics(),
+    getProjectStats(),
+    getUserStats(),
+    getMonthlyTrend()
+  ])
+
+  if (statsRes.status === 'fulfilled') {
+    const data = statsRes.value.data || {}
+    stats.totalUsers = data.totalUsers || data.userCount || 0
+    stats.totalProjects = data.totalProjects || data.projectCount || 0
+    stats.pendingAudit = data.pendingAudit || data.pendingProjects || 0
+    stats.pendingFeedback = data.pendingFeedback || data.feedbackCount || 0
+  }
+
+  projectCategoryData.value = projectStatsRes.status === 'fulfilled' ? normalizeChartData(projectStatsRes.value) : []
+  userRoleData.value = userStatsRes.status === 'fulfilled' ? normalizeChartData(userStatsRes.value) : []
+  if (trendRes.status === 'fulfilled') {
+    normalizeTrendData(trendRes.value)
+  } else {
+    monthlyTrendData.value = { months: [], created: [], approved: [] }
+  }
+}
+
 function handleResize() {
   pieChart?.resize()
   userPieChart?.resize()
   barChart?.resize()
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchDashboardData()
   initPieChart()
   initUserPieChart()
   initBarChart()

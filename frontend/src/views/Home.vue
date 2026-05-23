@@ -1,7 +1,7 @@
 <template>
   <div class="home-page">
     <!-- 轮播图 -->
-    <el-carousel :interval="5000" arrow="always" height="400px" class="home-carousel">
+    <el-carousel v-if="banners.length > 0" :interval="5000" arrow="always" height="400px" class="home-carousel">
       <el-carousel-item v-for="item in banners" :key="item.id">
         <div class="carousel-item" :style="{ backgroundColor: item.bgColor }">
           <div class="carousel-text">
@@ -12,6 +12,7 @@
         </div>
       </el-carousel-item>
     </el-carousel>
+    <el-empty v-else class="home-empty" description="暂无轮播数据" />
 
     <!-- 统计数据 -->
     <div class="stats-section">
@@ -57,6 +58,7 @@
           </el-card>
         </el-col>
       </el-row>
+      <el-empty v-if="hotProjects.length === 0" description="暂无热门项目" />
     </el-card>
 
     <!-- 培训活动 -->
@@ -84,6 +86,7 @@
           </el-card>
         </el-col>
       </el-row>
+      <el-empty v-if="trainings.length === 0" description="暂无培训活动" />
     </el-card>
 
     <!-- 路演预告 -->
@@ -96,7 +99,7 @@
           </el-button>
         </div>
       </template>
-      <el-timeline>
+      <el-timeline v-if="roadshows.length > 0">
         <el-timeline-item
           v-for="item in roadshows"
           :key="item.id"
@@ -116,99 +119,114 @@
           </el-card>
         </el-timeline-item>
       </el-timeline>
+      <el-empty v-else description="暂无路演预告" />
     </el-card>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import {
   TrendCharts, User, DataAnalysis, TrophyBase,
   FolderOpened, ArrowRight, Location
 } from '@element-plus/icons-vue'
+import { getPublicProjectList } from '@/api/project'
+import { getTrainingList } from '@/api/training'
+import { getRoadshowList } from '@/api/roadshow'
 
-const banners = ref([
-  { id: 1, title: '点燃创业梦想', description: '大学生创业孵化平台，为你的创意插上翅膀', bgColor: '#409eff' },
-  { id: 2, title: '汇聚创新力量', description: '与顶尖导师、投资者面对面交流', bgColor: '#337ecc' },
-  { id: 3, title: '成就未来之星', description: '优质项目路演、投资对接一站式服务', bgColor: '#2d6cbf' }
-])
+const banners = ref([])
+const hotProjects = ref([])
+const trainings = ref([])
+const roadshows = ref([])
 
 const stats = ref([
-  { label: '创业项目', value: '1,280+', icon: 'TrendCharts', color: '#409eff' },
-  { label: '导师团队', value: '350+', icon: 'User', color: '#67c23a' },
-  { label: '投资机构', value: '180+', icon: 'DataAnalysis', color: '#e6a23c' },
-  { label: '成功孵化', value: '650+', icon: 'TrophyBase', color: '#f56c6c' }
+  { label: '创业项目', value: 0, icon: 'TrendCharts', color: '#409eff' },
+  { label: '培训活动', value: 0, icon: 'User', color: '#67c23a' },
+  { label: '路演活动', value: 0, icon: 'DataAnalysis', color: '#e6a23c' },
+  { label: '展示项目', value: 0, icon: 'TrophyBase', color: '#f56c6c' }
 ])
 
-const hotProjects = ref([
-  {
-    id: 1,
-    title: '智能校园助手',
-    description: '基于AI的校园服务一体化平台，提供智能问答、课表管理等功能',
-    category: '人工智能',
-    funding: '50万'
-  },
-  {
-    id: 2,
-    title: '绿色循环快递盒',
-    description: '可重复使用的环保快递包装解决方案，减少快递垃圾',
-    category: '环保科技',
-    funding: '100万'
-  },
-  {
-    id: 3,
-    title: 'VR虚拟实验室',
-    description: '面向高校的虚拟仿真实验教学平台，降低实验成本',
-    category: '教育科技',
-    funding: '80万'
-  }
-])
+function getListData(res) {
+  return res.data?.list || res.data?.records || res.data || []
+}
 
-const trainings = ref([
-  {
-    id: 1,
-    day: '15',
-    month: '6月',
-    title: '创业计划书撰写技巧',
-    speaker: '张教授 - 创业导师',
-    location: '大学生活动中心301'
-  },
-  {
-    id: 2,
-    day: '20',
-    month: '6月',
-    title: '商业模式创新工作坊',
-    speaker: '李总 - 天使投资人',
-    location: '创新创业学院报告厅'
-  },
-  {
-    id: 3,
-    day: '28',
-    month: '6月',
-    title: '融资路演实战演练',
-    speaker: '王导师 - 资深投资人',
-    location: '科技园路演大厅'
-  }
-])
+function getTotal(res, list) {
+  return res.data?.total || res.data?.count || list.length
+}
 
-const roadshows = ref([
-  {
-    id: 1,
-    title: '第六届大学生创业路演大赛',
-    description: '汇聚全国高校优秀创业项目，现场对接投资人',
-    time: '2024-07-15 14:00',
-    status: 'upcoming',
-    location: '学校大礼堂'
-  },
-  {
-    id: 2,
-    title: '科技创新项目专场路演',
-    description: '聚焦人工智能、新能源、生物医药等前沿领域',
-    time: '2024-08-01 09:30',
-    status: 'upcoming',
-    location: '科技园国际会议中心'
+function formatFunding(item) {
+  const value = item.funding || item.fundingTarget || item.targetAmount || 0
+  return `${value}万`
+}
+
+function parseDate(value) {
+  const date = value ? new Date(value) : null
+  return date && !Number.isNaN(date.getTime()) ? date : null
+}
+
+function mapTraining(item) {
+  const date = parseDate(item.time || item.startTime || item.createdAt)
+  return {
+    ...item,
+    day: date ? String(date.getDate()).padStart(2, '0') : '--',
+    month: date ? `${date.getMonth() + 1}月` : '--',
+    speaker: item.speaker || item.mentorName || item.teacherName || '-',
+    location: item.location || '-'
   }
-])
+}
+
+function mapRoadshow(item) {
+  return {
+    ...item,
+    time: item.time || item.startTime || item.createdAt || '',
+    description: item.description || item.summary || '',
+    location: item.location || '-'
+  }
+}
+
+async function fetchHomeData() {
+  const [projectRes, trainingRes, roadshowRes] = await Promise.allSettled([
+    getPublicProjectList({ page: 1, pageSize: 3 }),
+    getTrainingList({ page: 1, pageSize: 3 }),
+    getRoadshowList({ page: 1, pageSize: 3 })
+  ])
+
+  if (projectRes.status === 'fulfilled') {
+    const list = getListData(projectRes.value)
+    hotProjects.value = list.map((item) => ({ ...item, funding: formatFunding(item) }))
+    banners.value = hotProjects.value.map((item, index) => ({
+      id: item.id || index,
+      title: item.title || item.name || '项目',
+      description: item.description || item.summary || '',
+      bgColor: ['#409eff', '#337ecc', '#2d6cbf'][index % 3]
+    }))
+    stats.value[0].value = getTotal(projectRes.value, list)
+    stats.value[3].value = list.length
+  } else {
+    hotProjects.value = []
+    banners.value = []
+  }
+
+  if (trainingRes.status === 'fulfilled') {
+    const list = getListData(trainingRes.value)
+    trainings.value = list.map(mapTraining)
+    stats.value[1].value = getTotal(trainingRes.value, list)
+  } else {
+    trainings.value = []
+  }
+
+  if (roadshowRes.status === 'fulfilled') {
+    const list = getListData(roadshowRes.value)
+    roadshows.value = list.map(mapRoadshow)
+    stats.value[2].value = getTotal(roadshowRes.value, list)
+  } else {
+    roadshows.value = []
+  }
+}
+
+onMounted(() => {
+  fetchHomeData()
+})
 </script>
 
 <style scoped>
@@ -221,6 +239,10 @@ const roadshows = ref([
   margin-bottom: 30px;
   border-radius: 8px;
   overflow: hidden;
+}
+
+.home-empty {
+  margin-bottom: 30px;
 }
 
 .carousel-item {

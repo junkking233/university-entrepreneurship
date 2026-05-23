@@ -105,6 +105,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { UserFilled } from '@element-plus/icons-vue'
 import { updateUserInfo } from '@/api/auth'
+import { getInvestorProfile } from '@/api/investment'
 
 const formRef = ref(null)
 const loading = ref(false)
@@ -114,8 +115,8 @@ const form = reactive({
   company: '',
   fields: [],
   stages: [],
-  investMin: 10,
-  investMax: 500,
+  investMin: 0,
+  investMax: 0,
   email: '',
   phone: '',
   bio: ''
@@ -142,19 +143,29 @@ async function handleSave() {
   }
 }
 
+async function loadProfile() {
+  try {
+    const res = await getInvestorProfile()
+    if (res?.data) {
+      Object.assign(form, res.data)
+    }
+  } catch {
+    Object.assign(form, {
+      name: '',
+      company: '',
+      fields: [],
+      stages: [],
+      investMin: 0,
+      investMax: 0,
+      email: '',
+      phone: '',
+      bio: ''
+    })
+  }
+}
+
 onMounted(() => {
-  const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
-  Object.assign(form, {
-    name: userInfo.nickname || '某投资机构',
-    company: '晨星创投',
-    fields: ['人工智能', '教育科技'],
-    stages: ['天使轮', 'Pre-A'],
-    investMin: 10,
-    investMax: 500,
-    email: userInfo.email || 'investor@example.com',
-    phone: '',
-    bio: '专注于早期科技创新项目投资，已成功投资超过50个创业项目。'
-  })
+  loadProfile()
 })
 </script>
 

@@ -44,8 +44,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-empty v-if="!loading && projectList.length === 0" description="暂无项目数据" />
 
-      <div class="pagination-wrapper">
+      <div class="pagination-wrapper" v-if="pagination.total > 0">
         <el-pagination
           v-model:current-page="pagination.page"
           v-model:page-size="pagination.pageSize"
@@ -167,11 +168,8 @@ async function fetchList() {
     projectList.value = res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
-    projectList.value = [
-      { id: 1, title: '智能校园助手', founder: '张三', category: '人工智能', status: 'pending', fundingTarget: 50, description: '基于AI的校园服务平台', createdAt: '2024-05-20' },
-      { id: 2, title: '在线教育平台', founder: '李四', category: '教育科技', status: 'pending', fundingTarget: 80, description: '在线互动教学平台', createdAt: '2024-05-22' }
-    ]
-    pagination.total = 2
+    projectList.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }

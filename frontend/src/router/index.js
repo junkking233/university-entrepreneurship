@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { verifyToken } from '@/api/auth'
 
 const routes = [
   {
@@ -152,8 +153,13 @@ const router = createRouter({
   routes
 })
 
+function clearAuth() {
+  localStorage.removeItem('token')
+  localStorage.removeItem('userInfo')
+}
+
 // 路由守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('token')
   const userInfo = JSON.parse(localStorage.getItem('userInfo') || 'null')
 
@@ -162,6 +168,15 @@ router.beforeEach((to, from, next) => {
       next({ name: 'Login', query: { redirect: to.fullPath } })
       return
     }
+
+    try {
+      await verifyToken()
+    } catch {
+      clearAuth()
+      next({ name: 'Login', query: { redirect: to.fullPath } })
+      return
+    }
+
     if (to.meta.role && userInfo && userInfo.role !== to.meta.role) {
       // 角色不匹配，跳转到对应 dashboard
       const roleRoutes = {

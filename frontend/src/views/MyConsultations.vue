@@ -39,6 +39,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-empty v-if="!loading && consultationList.length === 0" description="暂无咨询记录" />
 
       <div class="pagination-wrapper" v-if="pagination.total > 0">
         <el-pagination
@@ -180,10 +181,8 @@ async function fetchList() {
     consultationList.value = res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
-    consultationList.value = [
-      { id: 1, mentorName: '张教授', projectTitle: '智能校园助手', content: '请问如何评估市场需求？', status: 'replied', reply: '建议先做问卷调查...', createdAt: '2024-05-21' }
-    ]
-    pagination.total = 1
+    consultationList.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }
@@ -200,8 +199,8 @@ onMounted(async () => {
     mentors.value = mentorRes.data?.list || mentorRes.data || []
     myProjects.value = projectRes.data?.list || projectRes.data || []
   } catch {
-    mentors.value = [{ id: 1, name: '张教授' }, { id: 2, name: '李导师' }]
-    myProjects.value = [{ id: 1, title: '智能校园助手' }]
+    mentors.value = []
+    myProjects.value = []
   }
 })
 </script>

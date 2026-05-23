@@ -68,6 +68,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-empty v-if="pendingConsultations.length === 0" description="暂无待处理咨询" />
     </el-card>
 
     <!-- 我的培训活动 -->
@@ -88,6 +89,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-empty v-if="myTrainings.length === 0" description="暂无培训活动" />
     </el-card>
 
     <!-- 回复对话框 -->
@@ -121,10 +123,10 @@ import { getMentorConsultations, updateConsultationStatus } from '@/api/mentor'
 import { getMentorTrainings } from '@/api/mentor'
 
 const stats = reactive({
-  pendingConsult: 3,
-  trainingCount: 5,
-  studentCount: 28,
-  rating: '4.8'
+  pendingConsult: 0,
+  trainingCount: 0,
+  studentCount: 0,
+  rating: 0
 })
 
 const pendingConsultations = ref([])
@@ -168,13 +170,16 @@ async function fetchData() {
     ])
     pendingConsultations.value = consultRes.data?.list || consultRes.data || []
     myTrainings.value = trainingRes.data?.list || trainingRes.data || []
+    stats.pendingConsult = consultRes.data?.total || pendingConsultations.value.length
+    stats.trainingCount = trainingRes.data?.total || myTrainings.value.length
+    stats.studentCount = pendingConsultations.value.length
   } catch {
-    pendingConsultations.value = [
-      { id: 1, studentName: '张三', content: '请问如何做市场调研？', createdAt: '2024-05-21' }
-    ]
-    myTrainings.value = [
-      { id: 1, title: '创业计划书撰写技巧', time: '2024-06-15 14:00', location: '大学生活动中心301', enrolled: 45, capacity: 100 }
-    ]
+    pendingConsultations.value = []
+    myTrainings.value = []
+    stats.pendingConsult = 0
+    stats.trainingCount = 0
+    stats.studentCount = 0
+    stats.rating = 0
   }
 }
 

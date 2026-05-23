@@ -107,11 +107,8 @@ async function fetchProjects() {
     projectList.value = res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
-    projectList.value = [
-      { id: 1, title: '智能校园助手', category: '人工智能', status: 'approved', fundingTarget: 50, createdAt: '2024-05-20' },
-      { id: 2, title: '在线教育平台', category: '教育科技', status: 'pending', fundingTarget: 80, createdAt: '2024-05-22' }
-    ]
-    pagination.total = 2
+    projectList.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }

@@ -41,8 +41,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-empty v-if="!loading && consultationList.length === 0" description="暂无咨询记录" />
 
-      <div class="pagination-wrapper">
+      <div class="pagination-wrapper" v-if="pagination.total > 0">
         <el-pagination
           v-model:current-page="pagination.page"
           v-model:page-size="pagination.pageSize"
@@ -166,11 +167,8 @@ async function fetchList() {
     consultationList.value = res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
-    consultationList.value = [
-      { id: 1, studentName: '张三', projectTitle: '智能校园助手', content: '请问如何评估市场需求？', status: 'pending', createdAt: '2024-05-21' },
-      { id: 2, studentName: '李四', projectTitle: 'VR虚拟实验室', content: '技术架构应该怎么设计？', status: 'replied', reply: '建议采用微服务架构...', createdAt: '2024-05-20' }
-    ]
-    pagination.total = 2
+    consultationList.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }

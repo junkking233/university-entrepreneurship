@@ -74,6 +74,7 @@
         </el-table-column>
         <el-table-column prop="investDate" label="投资时间" width="160" />
       </el-table>
+      <el-empty v-if="recentInvestments.length === 0" description="暂无投资记录" />
     </el-card>
 
     <!-- 推荐项目 -->
@@ -96,31 +97,27 @@
           </el-card>
         </el-col>
       </el-row>
+      <el-empty v-if="recommendedProjects.length === 0" description="暂无推荐项目" />
     </el-card>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { Money, Coin, Collection, TrendCharts } from '@element-plus/icons-vue'
+import { getMyInvestments } from '@/api/investment'
+import { getPublicProjectList } from '@/api/project'
 
 const stats = reactive({
-  investCount: 5,
-  totalAmount: 350,
-  interestedCount: 12,
-  successRate: 80
+  investCount: 0,
+  totalAmount: 0,
+  interestedCount: 0,
+  successRate: 0
 })
 
-const recentInvestments = ref([
-  { id: 1, projectTitle: '智能校园助手', amount: 50, status: 'active', investDate: '2024-05-20' },
-  { id: 2, projectTitle: '绿色循环快递盒', amount: 100, status: 'pending', investDate: '2024-05-18' }
-])
+const recentInvestments = ref([])
 
-const recommendedProjects = ref([
-  { id: 1, title: 'VR虚拟实验室', category: '教育科技', fundingTarget: 80, description: '面向高校的虚拟仿真实验教学平台' },
-  { id: 2, title: '智慧医疗助手', category: '医疗健康', fundingTarget: 200, description: 'AI辅助诊疗系统' },
-  { id: 3, title: '碳中和解决方案', category: '环保科技', fundingTarget: 150, description: '企业碳排放管理平台' }
-])
+const recommendedProjects = ref([])
 
 function statusType(status) {
   const map = { active: 'success', pending: 'warning', completed: 'info' }
@@ -131,6 +128,43 @@ function statusLabel(status) {
   const map = { active: '进行中', pending: '待确认', completed: '已完成' }
   return map[status] || status
 }
+
+function getListData(res) {
+  return res.data?.list || res.data?.records || res.data || []
+}
+
+async function fetchDashboard() {
+  const [investmentRes, projectRes] = await Promise.allSettled([
+    getMyInvestments({ page: 1, pageSize: 5 }),
+    getPublicProjectList({ page: 1, pageSize: 3 })
+  ])
+
+  if (investmentRes.status === 'fulfilled') {
+    const list = getListData(investmentRes.value)
+    recentInvestments.value = list
+    stats.investCount = investmentRes.value.data?.total || list.length
+    stats.totalAmount = list.reduce((sum, item) => sum + Number(item.amount || 0), 0)
+    const completed = list.filter((item) => item.status === 'completed').length
+    stats.successRate = list.length ? Math.round((completed / list.length) * 100) : 0
+  } else {
+    recentInvestments.value = []
+    stats.investCount = 0
+    stats.totalAmount = 0
+    stats.successRate = 0
+  }
+
+  if (projectRes.status === 'fulfilled') {
+    recommendedProjects.value = getListData(projectRes.value)
+    stats.interestedCount = projectRes.value.data?.total || recommendedProjects.value.length
+  } else {
+    recommendedProjects.value = []
+    stats.interestedCount = 0
+  }
+}
+
+onMounted(() => {
+  fetchDashboard()
+})
 </script>
 
 <style scoped>

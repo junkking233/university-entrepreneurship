@@ -53,7 +53,9 @@
         </el-table-column>
       </el-table>
 
-      <div class="pagination-wrapper">
+      <el-empty v-if="!loading && roadshowList.length === 0" description="暂无路演活动" />
+
+      <div class="pagination-wrapper" v-if="pagination.total > 0">
         <el-pagination
           v-model:current-page="pagination.page"
           v-model:page-size="pagination.pageSize"
@@ -120,12 +122,8 @@ async function fetchList() {
     roadshowList.value = res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
-    roadshowList.value = [
-      { id: 1, title: '第六届大学生创业路演大赛', time: '2024-07-15 14:00', location: '学校大礼堂', organizer: '创新创业学院', status: 'upcoming', projectCount: 25 },
-      { id: 2, title: '科技创新项目专场路演', time: '2024-08-01 09:30', location: '科技园国际会议中心', organizer: '科技园管委会', status: 'upcoming', projectCount: 15 },
-      { id: 3, title: '春季创业项目路演', time: '2024-04-10 13:00', location: '大学生活动中心', organizer: '创业协会', status: 'finished', projectCount: 20 }
-    ]
-    pagination.total = 3
+    roadshowList.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }

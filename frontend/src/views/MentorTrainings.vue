@@ -33,8 +33,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-empty v-if="!loading && trainingList.length === 0" description="暂无培训活动" />
 
-      <div class="pagination-wrapper">
+      <div class="pagination-wrapper" v-if="pagination.total > 0">
         <el-pagination
           v-model:current-page="pagination.page"
           v-model:page-size="pagination.pageSize"
@@ -198,11 +199,8 @@ async function fetchList() {
     trainingList.value = res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
-    trainingList.value = [
-      { id: 1, title: '创业计划书撰写技巧', time: '2024-06-15 14:00', location: '大学生活动中心301', status: 'upcoming', enrolled: 45, capacity: 100 },
-      { id: 2, title: '商业模式创新工作坊', time: '2024-06-20 09:30', location: '创新创业学院报告厅', status: 'upcoming', enrolled: 78, capacity: 80 }
-    ]
-    pagination.total = 2
+    trainingList.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }

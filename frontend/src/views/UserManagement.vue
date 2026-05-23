@@ -62,8 +62,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-empty v-if="!loading && userList.length === 0" description="暂无用户数据" />
 
-      <div class="pagination-wrapper">
+      <div class="pagination-wrapper" v-if="pagination.total > 0">
         <el-pagination
           v-model:current-page="pagination.page"
           v-model:page-size="pagination.pageSize"
@@ -145,12 +146,8 @@ async function fetchList() {
     userList.value = res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
-    userList.value = [
-      { id: 1, username: 'student1', nickname: '张三', email: 'zhangsan@example.com', role: 'student', status: 'active', createdAt: '2024-05-01' },
-      { id: 2, username: 'mentor1', nickname: '张教授', email: 'professor@example.com', role: 'mentor', status: 'active', createdAt: '2024-05-02' },
-      { id: 3, username: 'investor1', nickname: '晨星创投', email: 'invest@example.com', role: 'investor', status: 'active', createdAt: '2024-05-03' }
-    ]
-    pagination.total = 3
+    userList.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }

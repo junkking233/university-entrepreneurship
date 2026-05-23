@@ -122,6 +122,7 @@
         </el-table-column>
         <el-table-column prop="createdAt" label="咨询时间" width="160" />
       </el-table>
+      <el-empty v-if="recentConsultations.length === 0" description="暂无咨询记录" />
     </el-card>
   </div>
 </template>
@@ -131,12 +132,14 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { FolderOpened, ChatDotRound, Reading, Star, Plus, Search, EditPen } from '@element-plus/icons-vue'
 import { getMyProjects, deleteProject } from '@/api/project'
+import { getMyConsultations } from '@/api/consultation'
+import { getStatistics } from '@/api/statistics'
 
 const stats = reactive({
-  projectCount: 3,
-  consultCount: 5,
-  trainingCount: 2,
-  favoriteCount: 8
+  projectCount: 0,
+  consultCount: 0,
+  trainingCount: 0,
+  favoriteCount: 0
 })
 
 const quickActions = [
@@ -174,18 +177,39 @@ async function fetchProjects() {
     const res = await getMyProjects()
     myProjects.value = res.data?.list || res.data || []
   } catch {
-    myProjects.value = [
-      { id: 1, title: '智能校园助手', category: '人工智能', status: 'approved', createdAt: '2024-05-20' },
-      { id: 2, title: '在线教育平台', category: '教育科技', status: 'pending', createdAt: '2024-05-22' }
-    ]
+    myProjects.value = []
+  }
+}
+
+async function fetchStats() {
+  try {
+    const res = await getStatistics()
+    const data = res.data || {}
+    stats.projectCount = data.projectCount || data.myProjectCount || data.totalProjects || 0
+    stats.consultCount = data.consultCount || data.consultationCount || 0
+    stats.trainingCount = data.trainingCount || data.myTrainingCount || 0
+    stats.favoriteCount = data.favoriteCount || data.collectionCount || 0
+  } catch {
+    stats.projectCount = 0
+    stats.consultCount = 0
+    stats.trainingCount = 0
+    stats.favoriteCount = 0
+  }
+}
+
+async function fetchRecentConsultations() {
+  try {
+    const res = await getMyConsultations({ page: 1, pageSize: 5 })
+    recentConsultations.value = res.data?.list || res.data || []
+  } catch {
+    recentConsultations.value = []
   }
 }
 
 onMounted(() => {
+  fetchStats()
   fetchProjects()
-  recentConsultations.value = [
-    { mentorName: '张教授', projectTitle: '智能校园助手', status: 'replied', createdAt: '2024-05-21' }
-  ]
+  fetchRecentConsultations()
 })
 </script>
 

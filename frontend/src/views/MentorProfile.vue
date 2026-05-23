@@ -112,23 +112,19 @@ async function handleSave() {
 
 async function loadProfile() {
   try {
-    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
-    const res = await getMentorProfile().catch(() => null)
+    const res = await getMentorProfile()
     if (res?.data) {
       Object.assign(form, res.data)
-    } else {
-      // Fallback from localStorage
-      Object.assign(form, {
-        name: userInfo.nickname || '张教授',
-        title: '教授',
-        expertise: ['人工智能', '企业管理'],
-        email: userInfo.email || 'zhang@example.com',
-        phone: '13800138000',
-        bio: '资深创业导师，拥有20年企业管理经验，曾辅导超过100个创业项目。'
-      })
     }
   } catch {
-    // fallback
+    Object.assign(form, {
+      name: '',
+      title: '',
+      expertise: [],
+      email: '',
+      phone: '',
+      bio: ''
+    })
   }
 }
 

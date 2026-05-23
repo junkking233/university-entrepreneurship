@@ -15,6 +15,11 @@ export function logout() {
   return request.post('/auth/logout')
 }
 
+// 验证 token 是否有效
+export function verifyToken() {
+  return request.get('/auth/verify')
+}
+
 // 获取当前用户信息
 export function getUserInfo() {
   return request.get('/user/profile')
