@@ -5,7 +5,7 @@
       <div class="header-left">
         <h2 class="logo" @click="$router.push('/')">
           <el-icon><School /></el-icon>
-          大学生创业平台
+          <span>大学生创业平台</span>
         </h2>
       </div>
       <el-menu
@@ -57,7 +57,11 @@
 
     <!-- 主内容区 -->
     <el-main class="layout-main">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <transition name="page-transition" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </el-main>
 
     <!-- 底部 -->
@@ -171,36 +175,75 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 32px;
   background: #fff;
-  border-bottom: 1px solid #e4e7ed;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--el-border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   position: sticky;
   top: 0;
   z-index: 1000;
-  height: 60px;
+  height: 64px;
 }
 
 .header-left .logo {
   cursor: pointer;
-  color: #409eff;
+  color: var(--el-color-primary);
   font-size: 20px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin: 0;
   white-space: nowrap;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: opacity 0.25s ease;
+}
+
+.header-left .logo:hover {
+  opacity: 0.8;
 }
 
 .header-menu {
   flex: 1;
   border-bottom: none !important;
-  margin: 0 20px;
+  margin: 0 24px;
+  background: transparent !important;
 }
 
 .header-menu .el-menu-item {
-  height: 60px;
-  line-height: 60px;
+  height: 64px;
+  line-height: 64px;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 0 18px !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  position: relative;
+}
+
+.header-menu .el-menu-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 3px;
+  background: var(--el-color-primary);
+  border-radius: 2px 2px 0 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(-50%);
+}
+
+.header-menu .el-menu-item:hover::after {
+  width: 60%;
+}
+
+.header-menu .el-menu-item.is-active::after {
+  width: 60%;
+}
+
+.header-menu .el-menu-item.is-active {
+  background: transparent !important;
 }
 
 .badge-item {
@@ -210,38 +253,69 @@ onMounted(() => {
 .header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   white-space: nowrap;
 }
 
 .user-dropdown {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   cursor: pointer;
-  color: #303133;
+  color: var(--el-text-color-primary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: background-color 0.25s ease;
+}
+
+.user-dropdown:hover {
+  background-color: var(--el-fill-color);
 }
 
 .username {
   font-size: 14px;
+  font-weight: 500;
 }
 
 .layout-main {
   flex: 1;
-  background-color: #f5f7fa;
-  padding: 20px;
+  background-color: var(--el-bg-color-page);
+  padding: 24px 32px;
 }
 
 .layout-footer {
-  background-color: #f5f7fa;
-  border-top: 1px solid #e4e7ed;
-  padding: 20px;
+  background-color: var(--el-bg-color-page);
+  border-top: 1px solid var(--el-border-color);
+  padding: 24px;
   text-align: center;
 }
 
 .footer-content p {
   margin: 4px 0;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   font-size: 13px;
+}
+
+/* 页面切换淡入动画 */
+.page-transition-enter-active,
+.page-transition-leave-active {
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-transition-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.page-transition-enter-to,
+.page-transition-leave-from {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>
