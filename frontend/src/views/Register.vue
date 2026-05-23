@@ -3,7 +3,7 @@
     <el-card class="register-card">
       <template #header>
         <div class="register-header">
-          <el-icon :size="40" color="#2563eb"><School /></el-icon>
+          <el-icon :size="40" color="#409eff"><School /></el-icon>
           <h2>用户注册</h2>
           <p>加入大学生创业平台，开启创业之旅</p>
         </div>
@@ -231,14 +231,14 @@ async function handleRegister() {
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 160px);
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  background: linear-gradient(135deg, #e8f4ff 0%, #d0e8ff 100%);
   padding: 40px 0;
 }
 
 .register-card {
   width: 480px;
   border-radius: 12px;
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.15);
 }
 
 .register-header {
@@ -248,11 +248,11 @@ async function handleRegister() {
 
 .register-header h2 {
   margin: 12px 0 8px;
-  color: var(--text-primary);
+  color: #303133;
 }
 
 .register-header p {
-  color: var(--text-secondary);
+  color: #909399;
   font-size: 14px;
 }
 
@@ -266,7 +266,7 @@ async function handleRegister() {
 
 .role-label {
   font-size: 14px;
-  color: var(--text-regular);
+  color: #606266;
   white-space: nowrap;
 }
 
@@ -277,6 +277,6 @@ async function handleRegister() {
 .register-footer {
   text-align: center;
   font-size: 14px;
-  color: var(--text-secondary);
+  color: #909399;
 }
 </style>

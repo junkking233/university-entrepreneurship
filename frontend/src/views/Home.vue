@@ -46,12 +46,12 @@
         <el-col :span="8" v-for="item in hotProjects" :key="item.id">
           <el-card shadow="hover" class="project-card" @click="$router.push(`/projects/${item.id}`)">
             <div class="project-image">
-              <el-icon :size="60" color="#2563eb"><FolderOpened /></el-icon>
+              <el-icon :size="60" color="#409eff"><FolderOpened /></el-icon>
             </div>
             <h3>{{ item.title }}</h3>
             <p class="project-desc">{{ item.description }}</p>
             <div class="project-meta">
-              <el-tag size="small" effect="light" type="primary">{{ item.category }}</el-tag>
+              <el-tag size="small" type="primary">{{ item.category }}</el-tag>
               <span class="project-funding">融资: {{ item.funding }}</span>
             </div>
           </el-card>
@@ -102,13 +102,13 @@
           :key="item.id"
           :timestamp="item.time"
           placement="top"
-          :color="item.status === 'upcoming' ? '#2563eb' : '#10b981'"
+          :color="item.status === 'upcoming' ? '#409eff' : '#67c23a'"
         >
           <el-card shadow="hover">
             <h3>{{ item.title }}</h3>
             <p>{{ item.description }}</p>
             <div class="roadshow-meta">
-              <el-tag :type="item.status === 'upcoming' ? 'primary' : 'success'" size="small" effect="light">
+              <el-tag :type="item.status === 'upcoming' ? 'primary' : 'success'" size="small">
                 {{ item.status === 'upcoming' ? '即将开始' : '进行中' }}
               </el-tag>
               <span>{{ item.location }}</span>
@@ -128,16 +128,16 @@ import {
 } from '@element-plus/icons-vue'
 
 const banners = ref([
-  { id: 1, title: '点燃创业梦想', description: '大学生创业孵化平台，为你的创意插上翅膀', bgColor: '#2563eb' },
-  { id: 2, title: '汇聚创新力量', description: '与顶尖导师、投资者面对面交流', bgColor: '#1d4ed8' },
-  { id: 3, title: '成就未来之星', description: '优质项目路演、投资对接一站式服务', bgColor: '#1e40af' }
+  { id: 1, title: '点燃创业梦想', description: '大学生创业孵化平台，为你的创意插上翅膀', bgColor: '#409eff' },
+  { id: 2, title: '汇聚创新力量', description: '与顶尖导师、投资者面对面交流', bgColor: '#337ecc' },
+  { id: 3, title: '成就未来之星', description: '优质项目路演、投资对接一站式服务', bgColor: '#2d6cbf' }
 ])
 
 const stats = ref([
-  { label: '创业项目', value: '1,280+', icon: 'TrendCharts', color: '#2563eb' },
-  { label: '导师团队', value: '350+', icon: 'User', color: '#10b981' },
-  { label: '投资机构', value: '180+', icon: 'DataAnalysis', color: '#f59e0b' },
-  { label: '成功孵化', value: '650+', icon: 'TrophyBase', color: '#f43f5e' }
+  { label: '创业项目', value: '1,280+', icon: 'TrendCharts', color: '#409eff' },
+  { label: '导师团队', value: '350+', icon: 'User', color: '#67c23a' },
+  { label: '投资机构', value: '180+', icon: 'DataAnalysis', color: '#e6a23c' },
+  { label: '成功孵化', value: '650+', icon: 'TrophyBase', color: '#f56c6c' }
 ])
 
 const hotProjects = ref([

@@ -7,7 +7,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <el-icon :size="36" color="#2563eb"><User /></el-icon>
+            <el-icon :size="36" color="#409eff"><User /></el-icon>
             <div class="stat-info">
               <div class="stat-value">{{ stats.totalUsers }}</div>
               <div class="stat-label">总用户数</div>
@@ -18,7 +18,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <el-icon :size="36" color="#10b981"><FolderOpened /></el-icon>
+            <el-icon :size="36" color="#67c23a"><FolderOpened /></el-icon>
             <div class="stat-info">
               <div class="stat-value">{{ stats.totalProjects }}</div>
               <div class="stat-label">总项目数</div>
@@ -29,7 +29,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <el-icon :size="36" color="#f59e0b"><Clock /></el-icon>
+            <el-icon :size="36" color="#e6a23c"><Clock /></el-icon>
             <div class="stat-info">
               <div class="stat-value">{{ stats.pendingAudit }}</div>
               <div class="stat-label">待审核</div>
@@ -40,7 +40,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <el-icon :size="36" color="#f43f5e"><ChatLineSquare /></el-icon>
+            <el-icon :size="36" color="#f56c6c"><ChatLineSquare /></el-icon>
             <div class="stat-info">
               <div class="stat-value">{{ stats.pendingFeedback }}</div>
               <div class="stat-label">待处理反馈</div>
@@ -144,7 +144,7 @@ function initUserPieChart() {
   userPieChart.setOption({
     tooltip: { trigger: 'item' },
     legend: { bottom: '0%' },
-    color: ['#2563eb', '#10b981', '#f59e0b', '#f43f5e'],
+    color: ['#409eff', '#67c23a', '#e6a23c', '#f56c6c'],
     series: [{
       name: '用户角色',
       type: 'pie',
@@ -190,8 +190,8 @@ function initBarChart() {
         data: [15, 22, 30, 28, 35, 42, 38, 45, 50, 48, 52, 55],
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#2563eb' },
-            { offset: 1, color: '#60a5fa' }
+            { offset: 0, color: '#409eff' },
+            { offset: 1, color: '#79bbff' }
           ])
         },
         barWidth: '50%'
@@ -202,8 +202,8 @@ function initBarChart() {
         data: [10, 18, 25, 22, 30, 38, 32, 40, 45, 42, 48, 50],
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#10b981' },
-            { offset: 1, color: '#6ee7b7' }
+            { offset: 0, color: '#67c23a' },
+            { offset: 1, color: '#95d475' }
           ])
         },
         barWidth: '50%'
@@ -241,7 +241,7 @@ onUnmounted(() => {
 
 .page-title {
   font-size: 24px;
-  color: var(--text-primary);
+  color: #303133;
   margin-bottom: 24px;
 }
 
@@ -262,12 +262,12 @@ onUnmounted(() => {
 .stat-value {
   font-size: 28px;
   font-weight: bold;
-  color: var(--text-primary);
+  color: #303133;
 }
 
 .stat-label {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: #909399;
   margin-top: 4px;
 }
 
