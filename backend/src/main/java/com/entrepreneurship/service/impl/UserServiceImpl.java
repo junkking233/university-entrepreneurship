@@ -97,9 +97,8 @@ public class UserServiceImpl implements UserService {
         if ("mentor".equals(registerDTO.getRole())) {
             MentorInfo mentorInfo = new MentorInfo();
             mentorInfo.setUserId(user.getId());
-            mentorInfo.setTitle("导师");
+            mentorInfo.setExpertise("创业指导");
             mentorInfo.setRating(java.math.BigDecimal.valueOf(5.0));
-            mentorInfo.setConsultCount(0);
             mentorInfo.setCreateTime(LocalDateTime.now());
             mentorInfoMapper.insert(mentorInfo);
         } else if ("investor".equals(registerDTO.getRole())) {

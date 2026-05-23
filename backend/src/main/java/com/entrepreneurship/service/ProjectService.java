@@ -10,7 +10,7 @@ public interface ProjectService {
     Project update(Long id, ProjectDTO projectDTO);
     void delete(Long id);
     Project getById(Long id);
-    PageResult<Project> list(int page, int size, String keyword, String category, String field, String status);
+    PageResult<Project> list(int page, int size, String keyword, String category, String ignoreField, String status);
     PageResult<Project> listPublic(int page, int size);
     void approve(Long id);
     void reject(Long id, String reason);

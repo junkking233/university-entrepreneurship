@@ -92,7 +92,7 @@ const demos = [
   { role: 'student', label: '学生演示', username: 'student', password: '123456', type: 'primary' },
   { role: 'mentor', label: '导师演示', username: 'mentor', password: '123456', type: 'success' },
   { role: 'investor', label: '投资者演示', username: 'investor', password: '123456', type: 'warning' },
-  { role: 'admin', label: '管理员演示', username: 'admin', password: '123456', type: 'danger' }
+  { role: 'admin', label: '管理员演示', username: 'admin', password: 'admin123', type: 'danger' }
 ]
 
 const roleRedirectMap = {
@@ -112,12 +112,12 @@ async function handleLogin() {
       username: form.username,
       password: form.password
     })
-    const { token, userInfo } = res.data
+    const { token, user } = res.data
     localStorage.setItem('token', token)
-    localStorage.setItem('userInfo', JSON.stringify(userInfo))
+    localStorage.setItem('userInfo', JSON.stringify(user))
     ElMessage.success('登录成功')
 
-    const redirect = route.query.redirect || roleRedirectMap[userInfo.role] || '/'
+    const redirect = route.query.redirect || roleRedirectMap[user.role] || '/'
     router.push(redirect)
   } catch {
     // 错误已在拦截器中处理

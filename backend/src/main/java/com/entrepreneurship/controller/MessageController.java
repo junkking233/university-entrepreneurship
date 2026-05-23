@@ -24,7 +24,7 @@ public class MessageController {
     @PostMapping("/send")
     public Result<Message> send(@RequestBody Message message, HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
-        message.setFromUserId(userId);
+        message.setSenderId(userId);
         SecurityInputUtil.sanitize(message);
         Message result = messageService.send(message);
         return Result.ok(result);

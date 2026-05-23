@@ -29,7 +29,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public PageResult<Message> listReceived(Long userId, int page, int size) {
         LambdaQueryWrapper<Message> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Message::getToUserId, userId);
+        wrapper.eq(Message::getReceiverId, userId);
         wrapper.orderByDesc(Message::getCreateTime);
         Page<Message> mpPage = new Page<>(page, size);
         Page<Message> result = messageMapper.selectPage(mpPage, wrapper);
@@ -39,7 +39,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public PageResult<Message> listSent(Long userId, int page, int size) {
         LambdaQueryWrapper<Message> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Message::getFromUserId, userId);
+        wrapper.eq(Message::getSenderId, userId);
         wrapper.orderByDesc(Message::getCreateTime);
         Page<Message> mpPage = new Page<>(page, size);
         Page<Message> result = messageMapper.selectPage(mpPage, wrapper);
@@ -63,7 +63,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public int getUnreadCount(Long userId) {
         LambdaQueryWrapper<Message> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Message::getToUserId, userId);
+        wrapper.eq(Message::getReceiverId, userId);
         wrapper.eq(Message::getIsRead, 0);
         return messageMapper.selectCount(wrapper).intValue();
     }

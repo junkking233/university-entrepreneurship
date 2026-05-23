@@ -16,14 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `entrepreneurship_db`
---
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `entrepreneurship_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-
-USE `entrepreneurship_db`;
-
---
 -- Table structure for table `blockchain_record`
 --
 
@@ -42,15 +34,6 @@ CREATE TABLE `blockchain_record` (
   CONSTRAINT `fk_blockchain_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `blockchain_record`
---
-
-LOCK TABLES `blockchain_record` WRITE;
-/*!40000 ALTER TABLE `blockchain_record` DISABLE KEYS */;
-/*!40000 ALTER TABLE `blockchain_record` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `consultation`
@@ -81,15 +64,6 @@ CREATE TABLE `consultation` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `consultation`
---
-
-LOCK TABLES `consultation` WRITE;
-/*!40000 ALTER TABLE `consultation` DISABLE KEYS */;
-/*!40000 ALTER TABLE `consultation` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `feedback`
 --
 
@@ -109,15 +83,6 @@ CREATE TABLE `feedback` (
   CONSTRAINT `fk_feedback_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `feedback`
---
-
-LOCK TABLES `feedback` WRITE;
-/*!40000 ALTER TABLE `feedback` DISABLE KEYS */;
-/*!40000 ALTER TABLE `feedback` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `investment`
@@ -142,15 +107,6 @@ CREATE TABLE `investment` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `investment`
---
-
-LOCK TABLES `investment` WRITE;
-/*!40000 ALTER TABLE `investment` DISABLE KEYS */;
-/*!40000 ALTER TABLE `investment` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `investor_info`
 --
 
@@ -167,17 +123,8 @@ CREATE TABLE `investor_info` (
   PRIMARY KEY (`id`),
   KEY `fk_investor_user` (`user_id`),
   CONSTRAINT `fk_investor_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `investor_info`
---
-
-LOCK TABLES `investor_info` WRITE;
-/*!40000 ALTER TABLE `investor_info` DISABLE KEYS */;
-/*!40000 ALTER TABLE `investor_info` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `mentor_info`
@@ -197,17 +144,8 @@ CREATE TABLE `mentor_info` (
   PRIMARY KEY (`id`),
   KEY `fk_mentor_user` (`user_id`),
   CONSTRAINT `fk_mentor_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `mentor_info`
---
-
-LOCK TABLES `mentor_info` WRITE;
-/*!40000 ALTER TABLE `mentor_info` DISABLE KEYS */;
-/*!40000 ALTER TABLE `mentor_info` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `message`
@@ -233,15 +171,6 @@ CREATE TABLE `message` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `message`
---
-
-LOCK TABLES `message` WRITE;
-/*!40000 ALTER TABLE `message` DISABLE KEYS */;
-/*!40000 ALTER TABLE `message` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `notification`
 --
 
@@ -261,15 +190,6 @@ CREATE TABLE `notification` (
   CONSTRAINT `fk_notification_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `notification`
---
-
-LOCK TABLES `notification` WRITE;
-/*!40000 ALTER TABLE `notification` DISABLE KEYS */;
-/*!40000 ALTER TABLE `notification` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `project`
@@ -299,15 +219,6 @@ CREATE TABLE `project` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `project`
---
-
-LOCK TABLES `project` WRITE;
-/*!40000 ALTER TABLE `project` DISABLE KEYS */;
-/*!40000 ALTER TABLE `project` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `project_rating`
 --
 
@@ -328,15 +239,6 @@ CREATE TABLE `project_rating` (
   CONSTRAINT `fk_rating_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `project_rating`
---
-
-LOCK TABLES `project_rating` WRITE;
-/*!40000 ALTER TABLE `project_rating` DISABLE KEYS */;
-/*!40000 ALTER TABLE `project_rating` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `roadshow`
@@ -362,15 +264,6 @@ CREATE TABLE `roadshow` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `roadshow`
---
-
-LOCK TABLES `roadshow` WRITE;
-/*!40000 ALTER TABLE `roadshow` DISABLE KEYS */;
-/*!40000 ALTER TABLE `roadshow` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `roadshow_project`
 --
 
@@ -388,15 +281,6 @@ CREATE TABLE `roadshow_project` (
   CONSTRAINT `fk_roadshow_project_roadshow` FOREIGN KEY (`roadshow_id`) REFERENCES `roadshow` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `roadshow_project`
---
-
-LOCK TABLES `roadshow_project` WRITE;
-/*!40000 ALTER TABLE `roadshow_project` DISABLE KEYS */;
-/*!40000 ALTER TABLE `roadshow_project` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `training`
@@ -425,15 +309,6 @@ CREATE TABLE `training` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `training`
---
-
-LOCK TABLES `training` WRITE;
-/*!40000 ALTER TABLE `training` DISABLE KEYS */;
-/*!40000 ALTER TABLE `training` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `training_registration`
 --
 
@@ -455,15 +330,6 @@ CREATE TABLE `training_registration` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `training_registration`
---
-
-LOCK TABLES `training_registration` WRITE;
-/*!40000 ALTER TABLE `training_registration` DISABLE KEYS */;
-/*!40000 ALTER TABLE `training_registration` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `user`
 --
 
@@ -481,24 +347,11 @@ CREATE TABLE `user` (
   `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` tinyint DEFAULT '1',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user`
---
-
-LOCK TABLES `user` WRITE;
-/*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'admin','0192023a7bbd73250516f069df18b500','admin','ç³»ç»Ÿç®¡ç†å‘˜',NULL,NULL,NULL,1,'2026-05-22 15:53:01');
-/*!40000 ALTER TABLE `user` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Dumping routines for database 'entrepreneurship_db'
---
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -509,4 +362,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-22 15:53:09
+-- Dump completed on 2026-05-23  2:38:21

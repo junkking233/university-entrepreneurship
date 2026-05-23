@@ -12,12 +12,13 @@ public class Message {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    @TableField("from_user_id")
-    private Long fromUserId;
-    @TableField("to_user_id")
-    private Long toUserId;
-    private String title;
+    @TableField("sender_id")
+    private Long senderId;
+    @TableField("receiver_id")
+    private Long receiverId;
     private String content;
+    @TableField("msg_type")
+    private String msgType;
     @TableField("is_read")
     private Integer isRead;
     @TableField("create_time")
@@ -25,14 +26,14 @@ public class Message {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public Long getFromUserId() { return fromUserId; }
-    public void setFromUserId(Long fromUserId) { this.fromUserId = fromUserId; }
-    public Long getToUserId() { return toUserId; }
-    public void setToUserId(Long toUserId) { this.toUserId = toUserId; }
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public Long getSenderId() { return senderId; }
+    public void setSenderId(Long senderId) { this.senderId = senderId; }
+    public Long getReceiverId() { return receiverId; }
+    public void setReceiverId(Long receiverId) { this.receiverId = receiverId; }
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
+    public String getMsgType() { return msgType; }
+    public void setMsgType(String msgType) { this.msgType = msgType; }
     public Integer getIsRead() { return isRead; }
     public void setIsRead(Integer isRead) { this.isRead = isRead; }
     public LocalDateTime getCreateTime() { return createTime; }

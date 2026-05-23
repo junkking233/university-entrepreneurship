@@ -42,11 +42,9 @@ public class MentorServiceImpl implements MentorService {
         wrapper.eq(MentorInfo::getUserId, userId);
         MentorInfo existing = mentorInfoMapper.selectOne(wrapper);
         if (existing != null) {
-            if (mentorInfo.getTitle() != null) existing.setTitle(mentorInfo.getTitle());
-            if (mentorInfo.getOrganization() != null) existing.setOrganization(mentorInfo.getOrganization());
             if (mentorInfo.getExpertise() != null) existing.setExpertise(mentorInfo.getExpertise());
-            if (mentorInfo.getBio() != null) existing.setBio(mentorInfo.getBio());
-            if (mentorInfo.getAvatar() != null) existing.setAvatar(mentorInfo.getAvatar());
+            if (mentorInfo.getIntroduction() != null) existing.setIntroduction(mentorInfo.getIntroduction());
+            if (mentorInfo.getAvailability() != null) existing.setAvailability(mentorInfo.getAvailability());
             mentorInfoMapper.updateById(existing);
         }
     }
@@ -55,13 +53,10 @@ public class MentorServiceImpl implements MentorService {
     public void updateRating(Long mentorId, Integer rating) {
         MentorInfo mentor = mentorInfoMapper.selectById(mentorId);
         if (mentor != null) {
-            int count = mentor.getConsultCount() != null ? mentor.getConsultCount() : 0;
             BigDecimal oldRating = mentor.getRating() != null ? mentor.getRating() : BigDecimal.valueOf(5.0);
-            BigDecimal newRating = oldRating.multiply(BigDecimal.valueOf(count))
-                    .add(BigDecimal.valueOf(rating))
-                    .divide(BigDecimal.valueOf(count + 1), 1, RoundingMode.HALF_UP);
+            BigDecimal newRating = oldRating.add(BigDecimal.valueOf(rating))
+                    .divide(BigDecimal.valueOf(2), 1, RoundingMode.HALF_UP);
             mentor.setRating(newRating);
-            mentor.setConsultCount(count + 1);
             mentorInfoMapper.updateById(mentor);
         }
     }

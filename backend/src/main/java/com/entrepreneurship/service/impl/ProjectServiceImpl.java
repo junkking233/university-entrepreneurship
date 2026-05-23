@@ -10,9 +10,7 @@ import com.entrepreneurship.mapper.ProjectMapper;
 import com.entrepreneurship.service.ProjectService;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -26,17 +24,16 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project create(Long userId, ProjectDTO projectDTO) {
         Project project = new Project();
-        project.setName(projectDTO.getName());
+        project.setStudentId(userId);
+        project.setTitle(projectDTO.getTitle());
         project.setDescription(projectDTO.getDescription());
         project.setCategory(projectDTO.getCategory());
-        project.setField(projectDTO.getField());
-        project.setTargetAmount(projectDTO.getTargetAmount());
-        project.setRaisedAmount(BigDecimal.ZERO);
-        project.setStatus("pending");
-        project.setCoverImage(projectDTO.getCoverImage());
         project.setTeamInfo(projectDTO.getTeamInfo());
         project.setBusinessPlan(projectDTO.getBusinessPlan());
-        project.setOwnerId(userId);
+        project.setStatus("pending");
+        project.setViews(0);
+        project.setRating(java.math.BigDecimal.ZERO);
+        project.setTrustScore(0);
         project.setCreateTime(LocalDateTime.now());
         project.setUpdateTime(LocalDateTime.now());
         projectMapper.insert(project);
@@ -49,12 +46,9 @@ public class ProjectServiceImpl implements ProjectService {
         if (project == null) {
             throw new BusinessException("项目不存在");
         }
-        if (projectDTO.getName() != null) project.setName(projectDTO.getName());
+        if (projectDTO.getTitle() != null) project.setTitle(projectDTO.getTitle());
         if (projectDTO.getDescription() != null) project.setDescription(projectDTO.getDescription());
         if (projectDTO.getCategory() != null) project.setCategory(projectDTO.getCategory());
-        if (projectDTO.getField() != null) project.setField(projectDTO.getField());
-        if (projectDTO.getTargetAmount() != null) project.setTargetAmount(projectDTO.getTargetAmount());
-        if (projectDTO.getCoverImage() != null) project.setCoverImage(projectDTO.getCoverImage());
         if (projectDTO.getTeamInfo() != null) project.setTeamInfo(projectDTO.getTeamInfo());
         if (projectDTO.getBusinessPlan() != null) project.setBusinessPlan(projectDTO.getBusinessPlan());
         project.setUpdateTime(LocalDateTime.now());
@@ -76,14 +70,11 @@ public class ProjectServiceImpl implements ProjectService {
     public PageResult<Project> list(int page, int size, String keyword, String category, String field, String status) {
         LambdaQueryWrapper<Project> wrapper = new LambdaQueryWrapper<>();
         if (keyword != null && !keyword.isEmpty()) {
-            wrapper.and(w -> w.like(Project::getName, keyword)
+            wrapper.and(w -> w.like(Project::getTitle, keyword)
                     .or().like(Project::getDescription, keyword));
         }
         if (category != null && !category.isEmpty()) {
             wrapper.eq(Project::getCategory, category);
-        }
-        if (field != null && !field.isEmpty()) {
-            wrapper.eq(Project::getField, field);
         }
         if (status != null && !status.isEmpty()) {
             wrapper.eq(Project::getStatus, status);
@@ -131,7 +122,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public PageResult<Project> listByOwner(Long userId, int page, int size) {
         LambdaQueryWrapper<Project> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Project::getOwnerId, userId);
+        wrapper.eq(Project::getStudentId, userId);
         wrapper.orderByDesc(Project::getCreateTime);
 
         Page<Project> mpPage = new Page<>(page, size);

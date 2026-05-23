@@ -11,7 +11,7 @@ request.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`
+      config.headers['token'] = token
     }
     return config
   },
@@ -26,8 +26,8 @@ request.interceptors.response.use(
     const res = response.data
     // 如果后端返回的 code 不是 200，视为错误
     if (res.code && res.code !== 200) {
-      ElMessage.error(res.message || '请求失败')
-      return Promise.reject(new Error(res.message || '请求失败'))
+      ElMessage.error(res.msg || '请求失败')
+      return Promise.reject(new Error(res.msg || '请求失败'))
     }
     return res
   },

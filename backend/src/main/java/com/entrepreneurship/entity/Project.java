@@ -13,18 +13,20 @@ public class Project {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    private String name;
+    @TableField("student_id")
+    private Long studentId;
+    private String title;
     private String description;
-    private String category;
-    private String field;
-    private BigDecimal targetAmount;
-    private BigDecimal raisedAmount;
-    private String status;
-    private String coverImage;
-    private String teamInfo;
+    @TableField("business_plan")
     private String businessPlan;
-    @TableField("owner_id")
-    private Long ownerId;
+    @TableField("team_info")
+    private String teamInfo;
+    private String category;
+    private String status;
+    private Integer views;
+    private BigDecimal rating;
+    @TableField("trust_score")
+    private Integer trustScore;
     @TableField("create_time")
     private LocalDateTime createTime;
     @TableField("update_time")
@@ -32,28 +34,26 @@ public class Project {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public Long getStudentId() { return studentId; }
+    public void setStudentId(Long studentId) { this.studentId = studentId; }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
-    public String getField() { return field; }
-    public void setField(String field) { this.field = field; }
-    public BigDecimal getTargetAmount() { return targetAmount; }
-    public void setTargetAmount(BigDecimal targetAmount) { this.targetAmount = targetAmount; }
-    public BigDecimal getRaisedAmount() { return raisedAmount; }
-    public void setRaisedAmount(BigDecimal raisedAmount) { this.raisedAmount = raisedAmount; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-    public String getCoverImage() { return coverImage; }
-    public void setCoverImage(String coverImage) { this.coverImage = coverImage; }
-    public String getTeamInfo() { return teamInfo; }
-    public void setTeamInfo(String teamInfo) { this.teamInfo = teamInfo; }
     public String getBusinessPlan() { return businessPlan; }
     public void setBusinessPlan(String businessPlan) { this.businessPlan = businessPlan; }
-    public Long getOwnerId() { return ownerId; }
-    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
+    public String getTeamInfo() { return teamInfo; }
+    public void setTeamInfo(String teamInfo) { this.teamInfo = teamInfo; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public Integer getViews() { return views; }
+    public void setViews(Integer views) { this.views = views; }
+    public BigDecimal getRating() { return rating; }
+    public void setRating(BigDecimal rating) { this.rating = rating; }
+    public Integer getTrustScore() { return trustScore; }
+    public void setTrustScore(Integer trustScore) { this.trustScore = trustScore; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
     public LocalDateTime getUpdateTime() { return updateTime; }

@@ -37,8 +37,7 @@ public class InvestmentServiceImpl implements InvestmentService {
 
         Project project = projectMapper.selectById(investment.getProjectId());
         if (project != null) {
-            BigDecimal raised = project.getRaisedAmount() != null ? project.getRaisedAmount() : BigDecimal.ZERO;
-            project.setRaisedAmount(raised.add(investment.getAmount()));
+            // Note: raisedAmount tracking removed — column not in DB schema
             projectMapper.updateById(project);
         }
 

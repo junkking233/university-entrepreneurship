@@ -171,14 +171,9 @@ public final class SecurityInputUtil {
         if (dto == null) {
             throw new BusinessException(400, "项目参数不能为空");
         }
-        dto.setName(requireText(dto.getName(), 100, "项目名称"));
+        dto.setTitle(requireText(dto.getTitle(), 100, "项目名称"));
         dto.setDescription(cleanText(dto.getDescription(), 2000, "项目描述"));
         dto.setCategory(cleanText(dto.getCategory(), 50, "项目分类"));
-        dto.setField(cleanText(dto.getField(), 50, "项目领域"));
-        if (dto.getTargetAmount() != null) {
-            dto.setTargetAmount(positiveAmount(dto.getTargetAmount(), "目标金额"));
-        }
-        dto.setCoverImage(cleanUrl(dto.getCoverImage(), 500, "封面图片"));
         dto.setTeamInfo(cleanText(dto.getTeamInfo(), 2000, "团队信息"));
         dto.setBusinessPlan(cleanText(dto.getBusinessPlan(), 5000, "商业计划"));
     }
@@ -187,12 +182,9 @@ public final class SecurityInputUtil {
         if (dto == null) {
             throw new BusinessException(400, "项目参数不能为空");
         }
-        if (dto.getName() != null) dto.setName(requireText(dto.getName(), 100, "项目名称"));
+        if (dto.getTitle() != null) dto.setTitle(requireText(dto.getTitle(), 100, "项目名称"));
         dto.setDescription(cleanText(dto.getDescription(), 2000, "项目描述"));
         dto.setCategory(cleanText(dto.getCategory(), 50, "项目分类"));
-        dto.setField(cleanText(dto.getField(), 50, "项目领域"));
-        if (dto.getTargetAmount() != null) dto.setTargetAmount(positiveAmount(dto.getTargetAmount(), "目标金额"));
-        dto.setCoverImage(cleanUrl(dto.getCoverImage(), 500, "封面图片"));
         dto.setTeamInfo(cleanText(dto.getTeamInfo(), 2000, "团队信息"));
         dto.setBusinessPlan(cleanText(dto.getBusinessPlan(), 5000, "商业计划"));
     }
@@ -212,11 +204,9 @@ public final class SecurityInputUtil {
 
     public static void sanitize(MentorInfo info) {
         if (info == null) throw new BusinessException(400, "导师信息不能为空");
-        info.setTitle(cleanText(info.getTitle(), 80, "职称"));
-        info.setOrganization(cleanText(info.getOrganization(), 120, "机构"));
         info.setExpertise(cleanText(info.getExpertise(), 500, "擅长领域"));
-        info.setBio(cleanText(info.getBio(), 2000, "简介"));
-        info.setAvatar(cleanUrl(info.getAvatar(), 500, "头像"));
+        info.setIntroduction(cleanText(info.getIntroduction(), 2000, "简介"));
+        info.setAvailability(cleanText(info.getAvailability(), 500, "可用时间"));
     }
 
     public static void sanitize(InvestorInfo info) {
@@ -238,8 +228,7 @@ public final class SecurityInputUtil {
 
     public static void sanitize(Message message) {
         if (message == null) throw new BusinessException(400, "消息参数不能为空");
-        requirePositiveId(message.getToUserId(), "接收用户");
-        message.setTitle(requireText(message.getTitle(), 100, "消息标题"));
+        requirePositiveId(message.getReceiverId(), "接收用户");
         message.setContent(requireText(message.getContent(), 2000, "消息内容"));
     }
 
@@ -333,9 +322,7 @@ public final class SecurityInputUtil {
         if (investment == null) throw new BusinessException(400, "投资参数不能为空");
         requirePositiveId(investment.getProjectId(), "项目");
         investment.setAmount(positiveAmount(investment.getAmount(), "投资金额"));
-        investment.setStage(cleanText(investment.getStage(), 50, "投资阶段"));
         investment.setStatus(cleanStatus(investment.getStatus()));
-        investment.setContract(cleanUrl(investment.getContract(), 500, "合同地址"));
     }
 
     public static String sanitizeBlockchainType(String type) {
