@@ -3,7 +3,7 @@
     <el-card class="login-card">
       <template #header>
         <div class="login-header">
-          <el-icon :size="40" color="#409eff"><School /></el-icon>
+          <el-icon :size="40" color="#2563eb"><School /></el-icon>
           <h2>用户登录</h2>
           <p>欢迎来到大学生创业平台</p>
         </div>
@@ -139,13 +139,13 @@ function quickLogin(demo) {
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 160px);
-  background: linear-gradient(135deg, #e8f4ff 0%, #d0e8ff 100%);
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
 }
 
 .login-card {
   width: 420px;
   border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(64, 158, 255, 0.15);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .login-header {

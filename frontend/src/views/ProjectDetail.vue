@@ -21,7 +21,7 @@
         </el-descriptions-item>
         <el-descriptions-item label="创始人">{{ project.founder }}</el-descriptions-item>
         <el-descriptions-item label="融资金额">
-          <span style="color:#e6a23c;font-weight:bold;">{{ project.fundingTarget }}万</span>
+          <span style="color:#f59e0b;font-weight:bold;">{{ project.fundingTarget }}万</span>
         </el-descriptions-item>
         <el-descriptions-item label="发布时间">{{ project.createdAt }}</el-descriptions-item>
         <el-descriptions-item label="团队规模">{{ project.teamSize || '3-5人' }}</el-descriptions-item>
@@ -153,7 +153,7 @@ onMounted(() => {
 .detail-header h2 {
   margin: 0;
   font-size: 22px;
-  color: #303133;
+  color: var(--text-primary);
 }
 
 .detail-section {
@@ -162,14 +162,14 @@ onMounted(() => {
 
 .detail-section h3 {
   font-size: 16px;
-  color: #303133;
+  color: var(--text-primary);
   margin-bottom: 12px;
   padding-left: 10px;
-  border-left: 3px solid #409eff;
+  border-left: 3px solid var(--primary-color);
 }
 
 .detail-section p {
-  color: #606266;
+  color: var(--text-regular);
   line-height: 1.8;
   font-size: 14px;
 }

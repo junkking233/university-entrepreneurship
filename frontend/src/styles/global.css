@@ -1,0 +1,211 @@
+/* Element Plus global theme overrides */
+
+html {
+  background: var(--bg-color);
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+.el-button {
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  letter-spacing: 0;
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.el-button:hover:not(.is-disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.el-button:active:not(.is-disabled) {
+  transform: translateY(0);
+}
+
+.el-button--primary:not(.is-link):not(.is-text) {
+  --el-button-bg-color: var(--primary-color);
+  --el-button-border-color: var(--primary-color);
+  --el-button-hover-bg-color: var(--primary-hover);
+  --el-button-hover-border-color: var(--primary-hover);
+  --el-button-active-bg-color: var(--primary-active);
+  --el-button-active-border-color: var(--primary-active);
+}
+
+.el-button.is-link,
+.el-button.is-text {
+  box-shadow: none;
+}
+
+.el-button.is-link:hover,
+.el-button.is-text:hover {
+  transform: none;
+}
+
+.el-card {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: var(--shadow-card);
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base),
+    transform var(--transition-base);
+}
+
+.el-card:hover {
+  border-color: rgba(64, 158, 255, 0.22);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+.el-card__header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--divider-color);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.el-card__body {
+  padding: 22px;
+}
+
+.el-input__wrapper,
+.el-textarea__inner,
+.el-select__wrapper {
+  border-radius: var(--radius-md);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.el-input__wrapper:hover,
+.el-textarea__inner:hover,
+.el-select__wrapper:hover {
+  box-shadow: 0 0 0 1px rgba(64, 158, 255, 0.38) inset;
+}
+
+.el-input__wrapper.is-focus,
+.el-select__wrapper.is-focused,
+.el-textarea__inner:focus {
+  box-shadow:
+    0 0 0 1px var(--primary-color) inset,
+    0 0 0 3px rgba(64, 158, 255, 0.12);
+}
+
+.el-table {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  --el-table-header-bg-color: var(--bg-soft);
+  --el-table-header-text-color: var(--text-primary);
+  --el-table-row-hover-bg-color: var(--primary-bg);
+  --el-table-border-color: var(--border-light);
+}
+
+.el-table th.el-table__cell {
+  font-weight: 600;
+}
+
+.el-menu {
+  --el-menu-active-color: var(--primary-color);
+  --el-menu-hover-bg-color: var(--primary-bg);
+  --el-menu-hover-text-color: var(--primary-color);
+  border-right: 0;
+}
+
+.el-menu--horizontal {
+  border-bottom: 1px solid var(--border-light);
+}
+
+.el-menu--horizontal > .el-menu-item,
+.el-menu--horizontal > .el-sub-menu .el-sub-menu__title {
+  border-bottom-width: 2px;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.el-tag {
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
+.el-dialog,
+.el-message-box,
+.el-popover.el-popper,
+.el-dropdown-menu,
+.el-select-dropdown,
+.el-picker-panel {
+  border-radius: var(--radius-lg);
+  border-color: var(--border-light);
+  box-shadow: var(--shadow-lg);
+}
+
+.el-dialog {
+  overflow: hidden;
+}
+
+.el-dialog__header,
+.el-message-box__header {
+  border-bottom: 1px solid var(--divider-color);
+}
+
+.el-dialog__footer,
+.el-message-box__btns {
+  border-top: 1px solid var(--divider-color);
+}
+
+.el-pagination.is-background .btn-prev,
+.el-pagination.is-background .btn-next,
+.el-pagination.is-background .el-pager li {
+  border-radius: var(--radius-md);
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-xs);
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.el-pagination.is-background .el-pager li.is-active {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.el-alert,
+.el-notification,
+.el-message {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.el-tabs__active-bar {
+  background-color: var(--primary-color);
+}
+
+.el-tabs__item {
+  transition: color var(--transition-fast);
+}
+
+.el-tabs__item.is-active,
+.el-tabs__item:hover {
+  color: var(--primary-color);
+}

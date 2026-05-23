@@ -39,7 +39,7 @@
         <template v-else>
           <el-dropdown @command="handleUserCommand">
             <span class="user-dropdown">
-              <el-avatar :size="32" :icon="UserFilled" />
+              <el-avatar :size="34" :icon="UserFilled" />
               <span class="username">{{ userName }}</span>
               <el-icon><ArrowDown /></el-icon>
             </span>
@@ -171,77 +171,110 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  background: #fff;
-  border-bottom: 1px solid #e4e7ed;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding: 0 32px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 1000;
-  height: 60px;
+  height: 64px;
 }
 
 .header-left .logo {
   cursor: pointer;
-  color: #409eff;
+  color: var(--primary-color);
   font-size: 20px;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin: 0;
   white-space: nowrap;
+  letter-spacing: -0.3px;
+  transition: opacity var(--transition-fast);
+}
+
+.header-left .logo:hover {
+  opacity: 0.8;
 }
 
 .header-menu {
   flex: 1;
   border-bottom: none !important;
-  margin: 0 20px;
+  margin: 0 24px;
+  background: transparent;
 }
 
 .header-menu .el-menu-item {
-  height: 60px;
-  line-height: 60px;
+  height: 64px;
+  line-height: 64px;
+  font-size: 15px;
+  padding: 0 20px;
+  letter-spacing: 0.2px;
 }
 
 .badge-item {
   margin-left: 6px;
 }
 
+.badge-item :deep(.el-badge__content) {
+  background: var(--danger-color);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+}
+
 .header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   white-space: nowrap;
+}
+
+.header-right .el-button {
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  padding: 8px 18px;
 }
 
 .user-dropdown {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   cursor: pointer;
-  color: #303133;
+  color: var(--text-primary);
+  padding: 6px 10px;
+  border-radius: var(--radius-lg);
+  transition: background var(--transition-fast);
+}
+
+.user-dropdown:hover {
+  background: var(--bg-color);
 }
 
 .username {
   font-size: 14px;
+  font-weight: 500;
 }
 
 .layout-main {
   flex: 1;
-  background-color: #f5f7fa;
-  padding: 20px;
+  background-color: var(--bg-color);
+  padding: 28px;
 }
 
 .layout-footer {
-  background-color: #f5f7fa;
-  border-top: 1px solid #e4e7ed;
-  padding: 20px;
+  background-color: var(--bg-white);
+  border-top: 1px solid var(--border-color);
+  padding: 28px;
   text-align: center;
 }
 
 .footer-content p {
   margin: 4px 0;
-  color: #909399;
+  color: var(--text-secondary);
   font-size: 13px;
+  letter-spacing: 0.2px;
 }
 </style>

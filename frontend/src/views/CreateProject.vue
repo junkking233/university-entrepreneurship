@@ -193,7 +193,7 @@ onMounted(() => {
 .page-header h2 {
   margin: 0;
   font-size: 20px;
-  color: #303133;
+  color: var(--text-primary);
 }
 
 .project-form {
@@ -202,7 +202,7 @@ onMounted(() => {
 
 .unit-text {
   margin-left: 8px;
-  color: #909399;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 </style>

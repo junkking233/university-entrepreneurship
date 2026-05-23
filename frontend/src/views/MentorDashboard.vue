@@ -7,7 +7,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <el-icon :size="36" color="#409eff"><ChatDotRound /></el-icon>
+            <el-icon :size="36" color="#2563eb"><ChatDotRound /></el-icon>
             <div class="stat-info">
               <div class="stat-value">{{ stats.pendingConsult }}</div>
               <div class="stat-label">待回复咨询</div>
@@ -18,7 +18,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <el-icon :size="36" color="#67c23a"><Reading /></el-icon>
+            <el-icon :size="36" color="#10b981"><Reading /></el-icon>
             <div class="stat-info">
               <div class="stat-value">{{ stats.trainingCount }}</div>
               <div class="stat-label">发布培训</div>
@@ -29,7 +29,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <el-icon :size="36" color="#e6a23c"><User /></el-icon>
+            <el-icon :size="36" color="#f59e0b"><User /></el-icon>
             <div class="stat-info">
               <div class="stat-value">{{ stats.studentCount }}</div>
               <div class="stat-label">服务学生</div>
@@ -40,7 +40,7 @@
       <el-col :span="6">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
-            <el-icon :size="36" color="#f56c6c"><Star /></el-icon>
+            <el-icon :size="36" color="#f43f5e"><Star /></el-icon>
             <div class="stat-info">
               <div class="stat-value">{{ stats.rating }}</div>
               <div class="stat-label">评分</div>
