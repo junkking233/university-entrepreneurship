@@ -65,4 +65,18 @@ public class MessageController {
         messageService.markAsRead(id);
         return Result.ok("标记已读成功");
     }
+
+    @PutMapping("/read-all")
+    public Result<?> markAllAsRead(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        messageService.markAllAsRead(userId);
+        return Result.ok("全部标记已读成功");
+    }
+
+    @DeleteMapping("/{id}")
+    public Result<?> delete(@PathVariable Long id) {
+        SecurityInputUtil.requirePositiveId(id, "消息ID");
+        messageService.delete(id);
+        return Result.ok("删除成功");
+    }
 }

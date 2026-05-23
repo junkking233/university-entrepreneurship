@@ -51,6 +51,20 @@ public class FeedbackController {
         return Result.ok(result);
     }
 
+    @GetMapping("/{id}")
+    public Result<Feedback> getById(@PathVariable Long id) {
+        SecurityInputUtil.requirePositiveId(id, "反馈ID");
+        return Result.ok(feedbackService.getById(id));
+    }
+
+    @PutMapping("/{id}/reply")
+    public Result<?> reply(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        SecurityInputUtil.requirePositiveId(id, "反馈ID");
+        String reply = SecurityInputUtil.cleanText(body.get("reply"), 2000, "回复内容");
+        feedbackService.reply(id, reply);
+        return Result.ok("回复成功");
+    }
+
     @PutMapping("/{id}/status")
     public Result<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
         SecurityInputUtil.requirePositiveId(id, "反馈ID");

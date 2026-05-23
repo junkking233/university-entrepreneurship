@@ -61,6 +61,16 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public void markAllAsRead(Long userId) {
+        LambdaQueryWrapper<Message> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Message::getReceiverId, userId);
+        wrapper.eq(Message::getIsRead, 0);
+        Message message = new Message();
+        message.setIsRead(1);
+        messageMapper.update(message, wrapper);
+    }
+
+    @Override
     public int getUnreadCount(Long userId) {
         LambdaQueryWrapper<Message> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Message::getReceiverId, userId);

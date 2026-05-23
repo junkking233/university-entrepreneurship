@@ -4,7 +4,9 @@ import com.entrepreneurship.common.PageResult;
 import com.entrepreneurship.common.Result;
 import com.entrepreneurship.common.SecurityInputUtil;
 import com.entrepreneurship.entity.Consultation;
+import com.entrepreneurship.entity.MentorInfo;
 import com.entrepreneurship.service.ConsultationService;
+import com.entrepreneurship.service.MentorService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +17,11 @@ import java.util.Map;
 public class ConsultationController {
 
     private final ConsultationService consultationService;
+    private final MentorService mentorService;
 
-    public ConsultationController(ConsultationService consultationService) {
+    public ConsultationController(ConsultationService consultationService, MentorService mentorService) {
         this.consultationService = consultationService;
+        this.mentorService = mentorService;
     }
 
     @PostMapping
@@ -62,6 +66,18 @@ public class ConsultationController {
             @RequestParam(defaultValue = "10") int size) {
         SecurityInputUtil.requirePositiveId(mentorId, "导师ID");
         return Result.ok(consultationService.listByMentor(mentorId, SecurityInputUtil.page(page), SecurityInputUtil.size(size)));
+    }
+
+    @GetMapping("/mentor/my")
+    public Result<PageResult<Consultation>> listMyMentorConsultations(HttpServletRequest request,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Long userId = (Long) request.getAttribute("userId");
+        MentorInfo mentor = mentorService.getByUserId(userId);
+        if (mentor == null) {
+            return Result.error("不是导师");
+        }
+        return Result.ok(consultationService.listByMentor(mentor.getId(), SecurityInputUtil.page(page), SecurityInputUtil.size(size)));
     }
 
     @PutMapping("/{id}/status")

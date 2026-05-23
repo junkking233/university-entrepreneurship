@@ -10,6 +10,7 @@ public interface MessageService {
     PageResult<Message> listSent(Long userId, int page, int size);
     Message getById(Long id);
     void markAsRead(Long id);
+    void markAllAsRead(Long userId);
     int getUnreadCount(Long userId);
     void delete(Long id);
 }

@@ -40,6 +40,13 @@ public class InvestmentController {
         return Result.ok(investmentService.getById(id));
     }
 
+    @PutMapping("/{id}")
+    public Result<Investment> update(@PathVariable Long id, @RequestBody Investment investment) {
+        SecurityInputUtil.requirePositiveId(id, "投资ID");
+        SecurityInputUtil.sanitize(investment);
+        return Result.ok(investmentService.update(id, investment));
+    }
+
     @GetMapping("/my")
     public Result<PageResult<Investment>> listMy(HttpServletRequest request,
             @RequestParam(defaultValue = "1") int page,
