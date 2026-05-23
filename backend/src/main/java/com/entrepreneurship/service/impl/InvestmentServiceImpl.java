@@ -52,6 +52,18 @@ public class InvestmentServiceImpl implements InvestmentService {
     }
 
     @Override
+    public Investment update(Long id, Investment investment) {
+        Investment existing = investmentMapper.selectById(id);
+        if (existing != null) {
+            if (investment.getAmount() != null) existing.setAmount(investment.getAmount());
+            if (investment.getStatus() != null) existing.setStatus(investment.getStatus());
+            if (investment.getProjectId() != null) existing.setProjectId(investment.getProjectId());
+            investmentMapper.updateById(existing);
+        }
+        return existing;
+    }
+
+    @Override
     public Investment getById(Long id) {
         return investmentMapper.selectById(id);
     }

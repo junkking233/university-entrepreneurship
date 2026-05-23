@@ -88,6 +88,35 @@ public class RoadshowController {
         return Result.ok(result);
     }
 
+    @PostMapping("/{id}/enroll")
+    public Result<RoadshowProject> enroll(@PathVariable Long id, HttpServletRequest request) {
+        SecurityInputUtil.requirePositiveId(id, "路演ID");
+        Long userId = (Long) request.getAttribute("userId");
+        PageResult<com.entrepreneurship.entity.Project> projects = projectService.listByOwner(userId, 1, 1);
+        if (projects.getRecords() == null || projects.getRecords().isEmpty()) {
+            return Result.error("请先创建项目后再报名路演");
+        }
+        com.entrepreneurship.entity.Project project = projects.getRecords().get(0);
+        RoadshowProject roadshowProject = new RoadshowProject();
+        roadshowProject.setRoadshowId(id);
+        roadshowProject.setProjectId(project.getId());
+        roadshowProject.setPresenterId(userId);
+        RoadshowProject result = roadshowService.addProject(roadshowProject);
+        return Result.ok(result);
+    }
+
+    @DeleteMapping("/{id}/enroll")
+    public Result<?> cancelEnroll(@PathVariable Long id, HttpServletRequest request) {
+        SecurityInputUtil.requirePositiveId(id, "路演ID");
+        Long userId = (Long) request.getAttribute("userId");
+        PageResult<com.entrepreneurship.entity.Project> projects = projectService.listByOwner(userId, 1, 1);
+        if (projects.getRecords() == null || projects.getRecords().isEmpty()) {
+            return Result.error("没有可取消的路演报名");
+        }
+        roadshowService.removeProject(id, projects.getRecords().get(0).getId());
+        return Result.ok("取消报名成功");
+    }
+
     @DeleteMapping("/{id}/projects/{projectId}")
     public Result<?> removeProject(@PathVariable Long id, @PathVariable Long projectId) {
         SecurityInputUtil.requirePositiveId(id, "路演ID");

@@ -106,6 +106,45 @@ public class AdminController {
         return Result.ok("状态更新成功");
     }
 
+    @GetMapping("/users/{id}")
+    public Result<User> getUser(@PathVariable Long id, HttpServletRequest request) {
+        requireAdmin(request);
+        SecurityInputUtil.requirePositiveId(id, "用户ID");
+        User user = userMapper.selectById(id);
+        if (user != null) {
+            user.setPassword(null);
+        }
+        return Result.ok(user);
+    }
+
+    @DeleteMapping("/users/{id}")
+    public Result<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
+        requireAdmin(request);
+        SecurityInputUtil.requirePositiveId(id, "用户ID");
+        userMapper.deleteById(id);
+        return Result.ok("删除成功");
+    }
+
+    @GetMapping("/projects")
+    public Result<PageResult<Project>> projects(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String field,
+            @RequestParam(required = false) String status,
+            HttpServletRequest request) {
+        requireAdmin(request);
+        PageResult<Project> result = projectService.list(
+                SecurityInputUtil.page(page),
+                SecurityInputUtil.size(size),
+                SecurityInputUtil.cleanText(keyword, 100, "关键词"),
+                SecurityInputUtil.cleanText(category, 50, "项目分类"),
+                SecurityInputUtil.cleanText(field, 50, "项目领域"),
+                SecurityInputUtil.cleanStatus(status));
+        return Result.ok(result);
+    }
+
     @GetMapping("/feedbacks")
     public Result<PageResult<Feedback>> feedbacks(
             @RequestParam(defaultValue = "1") int page,

@@ -12,15 +12,15 @@ export function register(data) {
 
 // 获取当前用户信息
 export function getUserInfo() {
-  return request.get('/auth/userinfo')
+  return request.get('/user/profile')
 }
 
 // 更新用户信息
 export function updateUserInfo(data) {
-  return request.put('/auth/userinfo', data)
+  return request.put('/user/profile', data)
 }
 
 // 修改密码
 export function changePassword(data) {
-  return request.put('/auth/password', data)
+  return request.put('/user/password', data)
 }
