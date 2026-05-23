@@ -19,3 +19,8 @@ export function getUserStats() {
 export function getMonthlyTrend() {
   return request.get('/statistics/projects/monthly')
 }
+
+// 获取月度投资趋势
+export function getInvestmentMonthlyTrend() {
+  return request.get('/statistics/investments/monthly')
+}

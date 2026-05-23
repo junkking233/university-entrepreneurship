@@ -15,6 +15,21 @@ export function getMyInvestments(params) {
   return request.get('/investment/my', { params: normalizeParams(params) })
 }
 
+// 获取项目投资记录
+export function getProjectInvestments(projectId, params) {
+  return request.get(`/investment/project/${projectId}`, { params: normalizeParams(params) })
+}
+
+// 获取投资人资料
+export function getInvestorProfile() {
+  return request.get('/investment/investor/profile')
+}
+
+// 更新投资人资料
+export function updateInvestorProfile(data) {
+  return request.put('/investment/investor/profile', data)
+}
+
 // 创建投资意向
 export function createInvestment(data) {
   return request.post('/investment', data)

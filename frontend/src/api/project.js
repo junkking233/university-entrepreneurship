@@ -10,6 +10,11 @@ export function getProjectList(params) {
   return request.get('/project/list', { params: normalizeParams(params) })
 }
 
+// 获取公开项目列表
+export function getPublicProjectList(params) {
+  return request.get('/project/list/public', { params: normalizeParams(params) })
+}
+
 // 获取项目详情
 export function getProjectDetail(id) {
   return request.get(`/project/${id}`)

@@ -23,6 +23,21 @@ export function getConsultationDetail(id) {
   return request.get(`/consultation/${id}`)
 }
 
+// 更新咨询
+export function updateConsultation(id, data) {
+  return request.put(`/consultation/${id}`, data)
+}
+
+// 删除咨询
+export function deleteConsultation(id) {
+  return request.delete(`/consultation/${id}`)
+}
+
+// 获取指定导师咨询列表
+export function getConsultationsByMentor(mentorId, params) {
+  return request.get(`/consultation/mentor/${mentorId}`, { params: normalizeParams(params) })
+}
+
 // 回复咨询
 export function replyConsultation(id, data) {
   return request.put(`/consultation/${id}/status`, {

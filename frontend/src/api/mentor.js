@@ -15,6 +15,11 @@ export function getMentorDetail(id) {
   return request.get(`/mentor/${id}`)
 }
 
+// 获取当前导师资料
+export function getMentorProfile() {
+  return request.get('/mentor/profile')
+}
+
 // 更新导师资料
 export function updateMentorProfile(data) {
   return request.put('/mentor/profile', data)

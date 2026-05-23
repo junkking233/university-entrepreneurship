@@ -15,6 +15,26 @@ export function getRoadshowDetail(id) {
   return request.get(`/roadshow/${id}`)
 }
 
+// 更新路演
+export function updateRoadshow(id, data) {
+  return request.put(`/roadshow/${id}`, data)
+}
+
+// 删除路演
+export function deleteRoadshow(id) {
+  return request.delete(`/roadshow/${id}`)
+}
+
+// 更新路演状态
+export function updateRoadshowStatus(id, data) {
+  return request.put(`/roadshow/${id}/status`, data)
+}
+
+// 添加路演项目
+export function addRoadshowProject(id, data) {
+  return request.post(`/roadshow/${id}/projects`, data)
+}
+
 // 报名路演
 export function enrollRoadshow(id) {
   return request.post(`/roadshow/${id}/enroll`)
@@ -28,4 +48,9 @@ export function cancelEnrollRoadshow(id) {
 // 创建路演（导师/管理员）
 export function createRoadshow(data) {
   return request.post('/roadshow/create', data)
+}
+
+// 移除路演项目
+export function removeRoadshowProject(id, projectId) {
+  return request.delete(`/roadshow/${id}/projects/${projectId}`)
 }

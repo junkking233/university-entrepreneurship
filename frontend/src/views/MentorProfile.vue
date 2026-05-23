@@ -74,7 +74,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { UserFilled } from '@element-plus/icons-vue'
-import { updateMentorProfile, getMentorDetail } from '@/api/mentor'
+import { updateMentorProfile, getMentorProfile } from '@/api/mentor'
 
 const formRef = ref(null)
 const loading = ref(false)
@@ -112,9 +112,8 @@ async function handleSave() {
 
 async function loadProfile() {
   try {
-    // Try to load from API first, then localStorage
     const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
-    const res = await getMentorDetail(userInfo.id).catch(() => null)
+    const res = await getMentorProfile().catch(() => null)
     if (res?.data) {
       Object.assign(form, res.data)
     } else {

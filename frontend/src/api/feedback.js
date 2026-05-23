@@ -10,6 +10,11 @@ export function submitFeedback(data) {
   return request.post('/feedback/create', data)
 }
 
+// 获取我的反馈列表
+export function getMyFeedbacks(params) {
+  return request.get('/feedback/my', { params: normalizeParams(params) })
+}
+
 // 获取反馈列表
 export function getFeedbackList(params) {
   return request.get('/feedback/list', { params: normalizeParams(params) })

@@ -43,3 +43,8 @@ export function updateFeedbackStatus(id, status) {
 export function getAllProjects(params) {
   return request.get('/admin/projects', { params: normalizeParams(params) })
 }
+
+// 获取管理员统计概览
+export function getAdminOverview() {
+  return request.get('/admin/statistics/overview')
+}
