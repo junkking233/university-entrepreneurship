@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class InvestmentServiceImpl implements InvestmentService {
@@ -31,7 +32,9 @@ public class InvestmentServiceImpl implements InvestmentService {
     @Override
     @Transactional
     public Investment create(Investment investment) {
-        investment.setStatus("completed");
+        if (investment.getStatus() == null || investment.getStatus().isEmpty()) {
+            investment.setStatus("pending");
+        }
         investment.setCreateTime(LocalDateTime.now());
         investmentMapper.insert(investment);
 
@@ -48,7 +51,7 @@ public class InvestmentServiceImpl implements InvestmentService {
             investorInfoMapper.updateById(investor);
         }
 
-        return investment;
+        return enrich(investment);
     }
 
     @Override
@@ -60,22 +63,25 @@ public class InvestmentServiceImpl implements InvestmentService {
             if (investment.getProjectId() != null) existing.setProjectId(investment.getProjectId());
             investmentMapper.updateById(existing);
         }
-        return existing;
+        return enrich(existing);
     }
 
     @Override
     public Investment getById(Long id) {
-        return investmentMapper.selectById(id);
+        return enrich(investmentMapper.selectById(id));
     }
 
     @Override
-    public PageResult<Investment> listByInvestor(Long investorId, int page, int size) {
+    public PageResult<Investment> listByInvestor(Long investorId, int page, int size, String status) {
         LambdaQueryWrapper<Investment> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Investment::getInvestorId, investorId);
+        if (status != null && !status.isEmpty()) {
+            wrapper.eq(Investment::getStatus, status);
+        }
         wrapper.orderByDesc(Investment::getCreateTime);
         Page<Investment> mpPage = new Page<>(page, size);
         Page<Investment> result = investmentMapper.selectPage(mpPage, wrapper);
-        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
+        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), enrich(result.getRecords()));
     }
 
     @Override
@@ -85,7 +91,7 @@ public class InvestmentServiceImpl implements InvestmentService {
         wrapper.orderByDesc(Investment::getCreateTime);
         Page<Investment> mpPage = new Page<>(page, size);
         Page<Investment> result = investmentMapper.selectPage(mpPage, wrapper);
-        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
+        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), enrich(result.getRecords()));
     }
 
     @Override
@@ -94,6 +100,25 @@ public class InvestmentServiceImpl implements InvestmentService {
         wrapper.orderByDesc(Investment::getCreateTime);
         Page<Investment> mpPage = new Page<>(page, size);
         Page<Investment> result = investmentMapper.selectPage(mpPage, wrapper);
-        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
+        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), enrich(result.getRecords()));
+    }
+
+    private Investment enrich(Investment investment) {
+        if (investment == null) {
+            return null;
+        }
+        if (investment.getProjectId() != null) {
+            Project project = projectMapper.selectById(investment.getProjectId());
+            if (project != null) {
+                investment.setProjectTitle(project.getTitle());
+            }
+        }
+        investment.setInvestDate(investment.getCreateTime());
+        return investment;
+    }
+
+    private List<Investment> enrich(List<Investment> investments) {
+        investments.forEach(this::enrich);
+        return investments;
     }
 }

@@ -50,13 +50,18 @@ public class InvestmentController {
     @GetMapping("/my")
     public Result<PageResult<Investment>> listMy(HttpServletRequest request,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String status) {
         Long userId = (Long) request.getAttribute("userId");
         InvestorInfo investor = investorService.getByUserId(userId);
         if (investor == null) {
             return Result.error("不是投资人");
         }
-        return Result.ok(investmentService.listByInvestor(investor.getId(), SecurityInputUtil.page(page), SecurityInputUtil.size(size)));
+        return Result.ok(investmentService.listByInvestor(
+                investor.getId(),
+                SecurityInputUtil.page(page),
+                SecurityInputUtil.size(size),
+                SecurityInputUtil.cleanStatus(status)));
     }
 
     @GetMapping("/project/{projectId}")

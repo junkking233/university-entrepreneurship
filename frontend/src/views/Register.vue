@@ -198,6 +198,7 @@ async function handleRegister() {
     const registerData = {
       role: form.role,
       username: form.username,
+      name: form.nickname,
       nickname: form.nickname,
       email: form.email,
       password: form.password
@@ -211,7 +212,8 @@ async function handleRegister() {
     }
 
     const res = await register(registerData)
-    const { token, userInfo } = res.data
+    const { token } = res.data
+    const userInfo = res.data.userInfo || res.data.user
     localStorage.setItem('token', token)
     localStorage.setItem('userInfo', JSON.stringify(userInfo))
     ElMessage.success('注册成功')

@@ -16,12 +16,15 @@ public class RoadshowProject {
     private Long roadshowId;
     @TableField("project_id")
     private Long projectId;
-    @TableField("presenter_id")
+    @TableField(exist = false)
     private Long presenterId;
+    @TableField(exist = false)
     private Integer orderNum;
+    @TableField(exist = false)
     private String status;
+    @TableField(exist = false)
     private String videoUrl;
-    @TableField("create_time")
+    @TableField(exist = false)
     private LocalDateTime createTime;
 
     public Long getId() { return id; }

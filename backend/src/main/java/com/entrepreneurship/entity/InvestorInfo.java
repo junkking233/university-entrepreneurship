@@ -16,10 +16,16 @@ public class InvestorInfo {
     @TableField("user_id")
     private Long userId;
     private String company;
+    @TableField(exist = false)
     private String position;
+    @TableField("investment_field")
     private String investmentField;
+    private String budget;
+    @TableField(exist = false)
     private BigDecimal totalInvestment;
+    @TableField(exist = false)
     private String bio;
+    @TableField(exist = false)
     private String avatar;
     @TableField("create_time")
     private LocalDateTime createTime;
@@ -34,6 +40,8 @@ public class InvestorInfo {
     public void setPosition(String position) { this.position = position; }
     public String getInvestmentField() { return investmentField; }
     public void setInvestmentField(String investmentField) { this.investmentField = investmentField; }
+    public String getBudget() { return budget; }
+    public void setBudget(String budget) { this.budget = budget; }
     public BigDecimal getTotalInvestment() { return totalInvestment; }
     public void setTotalInvestment(BigDecimal totalInvestment) { this.totalInvestment = totalInvestment; }
     public String getBio() { return bio; }

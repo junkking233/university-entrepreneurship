@@ -10,14 +10,22 @@
         <el-radio-group v-model="filterStatus" @change="fetchList">
           <el-radio-button value="">全部</el-radio-button>
           <el-radio-button value="pending">待回复</el-radio-button>
-          <el-radio-button value="replied">已回复</el-radio-button>
-          <el-radio-button value="closed">已关闭</el-radio-button>
+          <el-radio-button value="completed">已完成</el-radio-button>
+          <el-radio-button value="cancelled">已取消</el-radio-button>
         </el-radio-group>
       </div>
 
       <el-table :data="consultationList" v-loading="loading" stripe>
-        <el-table-column prop="studentName" label="学生" width="120" />
-        <el-table-column prop="projectTitle" label="关联项目" min-width="180" />
+        <el-table-column label="学生" width="120">
+          <template #default="{ row }">
+            {{ row.studentName || (row.studentId ? `学生${row.studentId}` : '-') }}
+          </template>
+        </el-table-column>
+        <el-table-column label="关联项目" min-width="180">
+          <template #default="{ row }">
+            {{ row.projectTitle || (row.projectId ? `项目${row.projectId}` : '-') }}
+          </template>
+        </el-table-column>
         <el-table-column prop="content" label="咨询内容" min-width="200" show-overflow-tooltip />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
@@ -26,7 +34,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="咨询时间" width="160" />
+        <el-table-column prop="createTime" label="咨询时间" width="180" />
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button
@@ -79,17 +87,17 @@
     <!-- 详情对话框 -->
     <el-dialog v-model="detailVisible" title="咨询详情" width="600px">
       <el-descriptions :column="1" border>
-        <el-descriptions-item label="学生">{{ currentItem.studentName }}</el-descriptions-item>
+        <el-descriptions-item label="学生">{{ currentItem.studentName || (currentItem.studentId ? `学生${currentItem.studentId}` : '-') }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="statusType(currentItem.status)" size="small">
             {{ statusLabel(currentItem.status) }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="咨询内容">{{ currentItem.content }}</el-descriptions-item>
-        <el-descriptions-item v-if="currentItem.reply" label="我的回复">
-          {{ currentItem.reply }}
+        <el-descriptions-item v-if="currentItem.notes" label="我的回复">
+          {{ currentItem.notes }}
         </el-descriptions-item>
-        <el-descriptions-item label="咨询时间">{{ currentItem.createdAt }}</el-descriptions-item>
+        <el-descriptions-item label="咨询时间">{{ currentItem.createTime }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
   </div>
@@ -118,12 +126,12 @@ const pagination = reactive({
 })
 
 function statusType(status) {
-  const map = { pending: 'warning', replied: 'success', closed: 'info' }
+  const map = { pending: 'warning', accepted: 'primary', completed: 'success', cancelled: 'info' }
   return map[status] || 'info'
 }
 
 function statusLabel(status) {
-  const map = { pending: '待回复', replied: '已回复', closed: '已关闭' }
+  const map = { pending: '待回复', accepted: '已受理', completed: '已完成', cancelled: '已取消' }
   return map[status] || status
 }
 
@@ -146,7 +154,7 @@ async function submitReply() {
   try {
     await updateConsultationStatus(currentItem.value.id, {
       reply: replyForm.reply,
-      status: 'replied'
+      status: 'completed'
     })
     ElMessage.success('回复成功')
     replyVisible.value = false
@@ -164,7 +172,8 @@ async function fetchList() {
       pageSize: pagination.pageSize,
       status: filterStatus.value
     })
-    consultationList.value = res.data?.list || res.data || []
+    const list = res.data?.records || res.data?.list || res.data || []
+    consultationList.value = filterStatus.value ? list.filter((item) => item.status === filterStatus.value) : list
     pagination.total = res.data?.total || 0
   } catch {
     consultationList.value = []

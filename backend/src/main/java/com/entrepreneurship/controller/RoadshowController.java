@@ -27,6 +27,7 @@ public class RoadshowController {
     @PostMapping("/create")
     public Result<Roadshow> create(@RequestBody Roadshow roadshow, HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
+        roadshow.setOrganizerId(userId);
         SecurityInputUtil.sanitize(roadshow);
         Roadshow result = roadshowService.create(roadshow);
         return Result.ok(result);
@@ -36,11 +37,13 @@ public class RoadshowController {
     public Result<PageResult<Roadshow>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String status) {
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword) {
         PageResult<Roadshow> result = roadshowService.list(
                 SecurityInputUtil.page(page),
                 SecurityInputUtil.size(size),
-                SecurityInputUtil.cleanStatus(status));
+                SecurityInputUtil.cleanStatus(status),
+                SecurityInputUtil.cleanText(keyword, 100, "关键词"));
         return Result.ok(result);
     }
 

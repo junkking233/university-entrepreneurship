@@ -70,6 +70,7 @@ public class UserServiceImpl implements UserService {
         result.put("token", token);
         user.setPassword(null);
         result.put("user", user);
+        result.put("userInfo", user);
         return result;
     }
 
@@ -104,7 +105,7 @@ public class UserServiceImpl implements UserService {
         } else if ("investor".equals(registerDTO.getRole())) {
             InvestorInfo investorInfo = new InvestorInfo();
             investorInfo.setUserId(user.getId());
-            investorInfo.setTotalInvestment(java.math.BigDecimal.ZERO);
+            investorInfo.setCompany(registerDTO.getCompany());
             investorInfo.setCreateTime(LocalDateTime.now());
             investorInfoMapper.insert(investorInfo);
         }

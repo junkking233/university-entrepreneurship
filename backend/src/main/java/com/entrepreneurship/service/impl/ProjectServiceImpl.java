@@ -6,19 +6,24 @@ import com.entrepreneurship.common.BusinessException;
 import com.entrepreneurship.common.PageResult;
 import com.entrepreneurship.dto.ProjectDTO;
 import com.entrepreneurship.entity.Project;
+import com.entrepreneurship.entity.User;
 import com.entrepreneurship.mapper.ProjectMapper;
+import com.entrepreneurship.mapper.UserMapper;
 import com.entrepreneurship.service.ProjectService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectMapper projectMapper;
+    private final UserMapper userMapper;
 
-    public ProjectServiceImpl(ProjectMapper projectMapper) {
+    public ProjectServiceImpl(ProjectMapper projectMapper, UserMapper userMapper) {
         this.projectMapper = projectMapper;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -30,6 +35,8 @@ public class ProjectServiceImpl implements ProjectService {
         project.setCategory(projectDTO.getCategory());
         project.setTeamInfo(projectDTO.getTeamInfo());
         project.setBusinessPlan(projectDTO.getBusinessPlan());
+        project.setFundingTarget(projectDTO.getFundingTarget());
+        project.setTeamSize(projectDTO.getTeamSize());
         project.setStatus("pending");
         project.setViews(0);
         project.setRating(java.math.BigDecimal.ZERO);
@@ -37,7 +44,7 @@ public class ProjectServiceImpl implements ProjectService {
         project.setCreateTime(LocalDateTime.now());
         project.setUpdateTime(LocalDateTime.now());
         projectMapper.insert(project);
-        return project;
+        return enrich(project);
     }
 
     @Override
@@ -51,9 +58,11 @@ public class ProjectServiceImpl implements ProjectService {
         if (projectDTO.getCategory() != null) project.setCategory(projectDTO.getCategory());
         if (projectDTO.getTeamInfo() != null) project.setTeamInfo(projectDTO.getTeamInfo());
         if (projectDTO.getBusinessPlan() != null) project.setBusinessPlan(projectDTO.getBusinessPlan());
+        if (projectDTO.getFundingTarget() != null) project.setFundingTarget(projectDTO.getFundingTarget());
+        if (projectDTO.getTeamSize() != null) project.setTeamSize(projectDTO.getTeamSize());
         project.setUpdateTime(LocalDateTime.now());
         projectMapper.updateById(project);
-        return project;
+        return enrich(project);
     }
 
     @Override
@@ -63,7 +72,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project getById(Long id) {
-        return projectMapper.selectById(id);
+        return enrich(projectMapper.selectById(id));
     }
 
     @Override
@@ -84,19 +93,12 @@ public class ProjectServiceImpl implements ProjectService {
         Page<Project> mpPage = new Page<>(page, size);
         Page<Project> result = projectMapper.selectPage(mpPage, wrapper);
 
-        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
+        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), enrich(result.getRecords()));
     }
 
     @Override
-    public PageResult<Project> listPublic(int page, int size) {
-        LambdaQueryWrapper<Project> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Project::getStatus, "approved");
-        wrapper.orderByDesc(Project::getCreateTime);
-
-        Page<Project> mpPage = new Page<>(page, size);
-        Page<Project> result = projectMapper.selectPage(mpPage, wrapper);
-
-        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
+    public PageResult<Project> listPublic(int page, int size, String keyword, String category) {
+        return list(page, size, keyword, category, null, "approved");
     }
 
     @Override
@@ -128,6 +130,24 @@ public class ProjectServiceImpl implements ProjectService {
         Page<Project> mpPage = new Page<>(page, size);
         Page<Project> result = projectMapper.selectPage(mpPage, wrapper);
 
-        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
+        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), enrich(result.getRecords()));
+    }
+
+    private Project enrich(Project project) {
+        if (project == null) {
+            return null;
+        }
+        if (project.getStudentId() != null) {
+            User user = userMapper.selectById(project.getStudentId());
+            if (user != null) {
+                project.setFounder(user.getName() != null && !user.getName().isEmpty() ? user.getName() : user.getUsername());
+            }
+        }
+        return project;
+    }
+
+    private List<Project> enrich(List<Project> projects) {
+        projects.forEach(this::enrich);
+        return projects;
     }
 }

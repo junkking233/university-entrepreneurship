@@ -70,8 +70,14 @@ public class ProjectController {
     @GetMapping("/list/public")
     public Result<PageResult<Project>> listPublic(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        PageResult<Project> result = projectService.listPublic(SecurityInputUtil.page(page), SecurityInputUtil.size(size));
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String category) {
+        PageResult<Project> result = projectService.listPublic(
+                SecurityInputUtil.page(page),
+                SecurityInputUtil.size(size),
+                SecurityInputUtil.cleanText(keyword, 100, "关键词"),
+                SecurityInputUtil.cleanText(category, 50, "项目分类"));
         return Result.ok(result);
     }
 

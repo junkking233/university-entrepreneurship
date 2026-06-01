@@ -8,6 +8,8 @@ public class ProjectDTO {
     private String category;
     private String teamInfo;
     private String businessPlan;
+    private BigDecimal fundingTarget;
+    private Integer teamSize;
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -19,4 +21,8 @@ public class ProjectDTO {
     public void setTeamInfo(String teamInfo) { this.teamInfo = teamInfo; }
     public String getBusinessPlan() { return businessPlan; }
     public void setBusinessPlan(String businessPlan) { this.businessPlan = businessPlan; }
+    public BigDecimal getFundingTarget() { return fundingTarget; }
+    public void setFundingTarget(BigDecimal fundingTarget) { this.fundingTarget = fundingTarget; }
+    public Integer getTeamSize() { return teamSize; }
+    public void setTeamSize(Integer teamSize) { this.teamSize = teamSize; }
 }

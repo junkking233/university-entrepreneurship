@@ -14,17 +14,22 @@ public class Roadshow {
     private Long id;
     private String title;
     private String description;
+    @TableField("organizer_id")
+    private Long organizerId;
     @TableField("start_time")
     private LocalDateTime startTime;
     @TableField("end_time")
     private LocalDateTime endTime;
     private String location;
-    @TableField("max_projects")
+    @TableField(exist = false)
     private Integer maxProjects;
-    @TableField("current_projects")
+    @TableField(exist = false)
     private Integer currentProjects;
     private String status;
+    @TableField(exist = false)
     private String coverImage;
+    @TableField(exist = false)
+    private String organizerName;
     @TableField("create_time")
     private LocalDateTime createTime;
 
@@ -34,6 +39,8 @@ public class Roadshow {
     public void setTitle(String title) { this.title = title; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public Long getOrganizerId() { return organizerId; }
+    public void setOrganizerId(Long organizerId) { this.organizerId = organizerId; }
     public LocalDateTime getStartTime() { return startTime; }
     public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
     public LocalDateTime getEndTime() { return endTime; }
@@ -48,6 +55,8 @@ public class Roadshow {
     public void setStatus(String status) { this.status = status; }
     public String getCoverImage() { return coverImage; }
     public void setCoverImage(String coverImage) { this.coverImage = coverImage; }
+    public String getOrganizerName() { return organizerName; }
+    public void setOrganizerName(String organizerName) { this.organizerName = organizerName; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 }

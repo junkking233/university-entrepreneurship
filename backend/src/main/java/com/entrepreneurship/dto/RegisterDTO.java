@@ -7,6 +7,7 @@ public class RegisterDTO {
     private String email;
     private String phone;
     private String role;
+    private String company;
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
@@ -20,4 +21,6 @@ public class RegisterDTO {
     public void setPhone(String phone) { this.phone = phone; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+    public String getCompany() { return company; }
+    public void setCompany(String company) { this.company = company; }
 }

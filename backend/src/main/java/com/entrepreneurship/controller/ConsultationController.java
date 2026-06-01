@@ -27,7 +27,7 @@ public class ConsultationController {
     @PostMapping
     public Result<Consultation> create(@RequestBody Consultation consultation, HttpServletRequest request) {
         Long userId = (Long) request.getAttribute("userId");
-        consultation.setUserId(userId);
+        consultation.setStudentId(userId);
         SecurityInputUtil.sanitize(consultation);
         return Result.ok(consultationService.create(consultation));
     }

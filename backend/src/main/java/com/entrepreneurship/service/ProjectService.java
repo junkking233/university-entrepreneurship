@@ -11,7 +11,7 @@ public interface ProjectService {
     void delete(Long id);
     Project getById(Long id);
     PageResult<Project> list(int page, int size, String keyword, String category, String ignoreField, String status);
-    PageResult<Project> listPublic(int page, int size);
+    PageResult<Project> listPublic(int page, int size, String keyword, String category);
     void approve(Long id);
     void reject(Long id, String reason);
     PageResult<Project> listByOwner(Long userId, int page, int size);

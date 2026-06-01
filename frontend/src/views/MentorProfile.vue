@@ -75,6 +75,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { UserFilled } from '@element-plus/icons-vue'
 import { updateMentorProfile, getMentorProfile } from '@/api/mentor'
+import { getUserInfo, updateUserInfo } from '@/api/auth'
 
 const formRef = ref(null)
 const loading = ref(false)
@@ -95,13 +96,45 @@ const rules = {
   email: [{ required: true, message: '请输入邮箱', trigger: 'blur' }]
 }
 
+const expertiseOptions = ['人工智能', '企业管理', '市场营销', '财务管理', '技术开发', '法律合规']
+
+function cleanFormText(value) {
+  return value ? String(value).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/g, '') : ''
+}
+
+function normalizeExpertise(value) {
+  const list = Array.isArray(value)
+    ? value
+    : String(value || '').split(/[,，]/).map((item) => item.trim()).filter(Boolean)
+  const validList = list.filter((item) => expertiseOptions.includes(item))
+  return validList.length > 0 ? validList : ['人工智能']
+}
+
 async function handleSave() {
   const valid = await formRef.value.validate().catch(() => false)
   if (!valid) return
 
   loading.value = true
   try {
-    await updateMentorProfile(form)
+    await Promise.all([
+      updateMentorProfile({
+        expertise: form.expertise.join(','),
+        introduction: cleanFormText(form.bio),
+        availability: cleanFormText(form.title)
+      }),
+      updateUserInfo({
+        name: cleanFormText(form.name),
+        email: form.email,
+        phone: form.phone
+      })
+    ])
+    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
+    localStorage.setItem('userInfo', JSON.stringify({
+      ...userInfo,
+      name: form.name,
+      email: form.email,
+      phone: form.phone
+    }))
     ElMessage.success('保存成功')
   } catch {
     // error handled
@@ -112,10 +145,17 @@ async function handleSave() {
 
 async function loadProfile() {
   try {
-    const res = await getMentorProfile()
-    if (res?.data) {
-      Object.assign(form, res.data)
-    }
+    const [mentorRes, userRes] = await Promise.all([getMentorProfile(), getUserInfo()])
+    const mentor = mentorRes?.data || {}
+    const user = userRes?.data || {}
+    Object.assign(form, {
+      name: cleanFormText(user.name || user.username || ''),
+      title: cleanFormText(mentor.availability || ''),
+      expertise: normalizeExpertise(mentor.expertise),
+      email: user.email || '',
+      phone: user.phone || '',
+      bio: cleanFormText(mentor.introduction || '')
+    })
   } catch {
     Object.assign(form, {
       name: '',

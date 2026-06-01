@@ -21,9 +21,9 @@
         </el-descriptions-item>
         <el-descriptions-item label="创始人">{{ project.founder }}</el-descriptions-item>
         <el-descriptions-item label="融资金额">
-          <span style="color:#e6a23c;font-weight:bold;">{{ project.fundingTarget }}万</span>
+          <span style="color:#e6a23c;font-weight:bold;">{{ project.fundingTarget ? `${project.fundingTarget}万` : '-' }}</span>
         </el-descriptions-item>
-        <el-descriptions-item label="发布时间">{{ project.createdAt }}</el-descriptions-item>
+        <el-descriptions-item label="发布时间">{{ project.createTime }}</el-descriptions-item>
         <el-descriptions-item label="团队规模">{{ project.teamSize || '-' }}</el-descriptions-item>
       </el-descriptions>
 
@@ -42,7 +42,7 @@
 
       <div class="detail-section">
         <h3>团队介绍</h3>
-        <p>{{ project.teamIntro || '-' }}</p>
+        <p>{{ project.teamInfo || '-' }}</p>
       </div>
 
       <div class="detail-actions">
@@ -76,20 +76,20 @@ const project = ref({
   status: '',
   founder: '',
   fundingTarget: 0,
-  createdAt: '',
+  createTime: '',
   description: '',
   businessPlan: '',
-  teamIntro: '',
+  teamInfo: '',
   teamSize: ''
 })
 
 function statusType(status) {
-  const map = { funding: 'primary', funded: 'success', incubating: 'warning' }
+  const map = { funding: 'primary', funded: 'success', incubating: 'warning', pending: 'warning', approved: 'success', rejected: 'danger', closed: 'info' }
   return map[status] || 'info'
 }
 
 function statusLabel(status) {
-  const map = { funding: '融资中', funded: '已融资', incubating: '孵化中' }
+  const map = { funding: '融资中', funded: '已融资', incubating: '孵化中', pending: '审核中', approved: '已通过', rejected: '已驳回', closed: '已关闭' }
   return map[status] || status
 }
 
@@ -124,10 +124,10 @@ async function fetchDetail() {
       status: '',
       founder: '',
       fundingTarget: 0,
-      createdAt: '',
+      createTime: '',
       description: '',
       businessPlan: '',
-      teamIntro: '',
+      teamInfo: '',
       teamSize: ''
     }
   } finally {

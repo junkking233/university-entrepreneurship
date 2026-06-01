@@ -32,10 +32,10 @@
         </el-table-column>
         <el-table-column prop="fundingTarget" label="融资金额" width="120">
           <template #default="{ row }">
-            {{ row.fundingTarget }}万
+            {{ row.fundingTarget ? `${row.fundingTarget}万` : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="发布时间" width="160" />
+        <el-table-column prop="createTime" label="发布时间" width="180" />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="$router.push(`/student/projects/edit/${row.id}`)">
@@ -104,7 +104,7 @@ async function fetchProjects() {
   loading.value = true
   try {
     const res = await getMyProjects({ page: pagination.page, pageSize: pagination.pageSize })
-    projectList.value = res.data?.list || res.data || []
+    projectList.value = res.data?.records || res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
     projectList.value = []

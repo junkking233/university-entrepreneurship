@@ -14,6 +14,9 @@ public class Training {
     private Long id;
     private String title;
     private String description;
+    @TableField("mentor_id")
+    private Long mentorId;
+    @TableField("type")
     private String instructor;
     @TableField("start_time")
     private LocalDateTime startTime;
@@ -25,7 +28,10 @@ public class Training {
     @TableField("current_participants")
     private Integer currentParticipants;
     private String status;
+    @TableField(exist = false)
     private String coverImage;
+    @TableField(exist = false)
+    private String mentorName;
     @TableField("create_time")
     private LocalDateTime createTime;
 
@@ -35,6 +41,8 @@ public class Training {
     public void setTitle(String title) { this.title = title; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public Long getMentorId() { return mentorId; }
+    public void setMentorId(Long mentorId) { this.mentorId = mentorId; }
     public String getInstructor() { return instructor; }
     public void setInstructor(String instructor) { this.instructor = instructor; }
     public LocalDateTime getStartTime() { return startTime; }
@@ -51,6 +59,8 @@ public class Training {
     public void setStatus(String status) { this.status = status; }
     public String getCoverImage() { return coverImage; }
     public void setCoverImage(String coverImage) { this.coverImage = coverImage; }
+    public String getMentorName() { return mentorName; }
+    public void setMentorName(String mentorName) { this.mentorName = mentorName; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 }

@@ -21,6 +21,10 @@ public class Investment {
     private String status;
     @TableField("create_time")
     private LocalDateTime createTime;
+    @TableField(exist = false)
+    private String projectTitle;
+    @TableField(exist = false)
+    private LocalDateTime investDate;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -34,4 +38,8 @@ public class Investment {
     public void setStatus(String status) { this.status = status; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public String getProjectTitle() { return projectTitle; }
+    public void setProjectTitle(String projectTitle) { this.projectTitle = projectTitle; }
+    public LocalDateTime getInvestDate() { return investDate != null ? investDate : createTime; }
+    public void setInvestDate(LocalDateTime investDate) { this.investDate = investDate; }
 }

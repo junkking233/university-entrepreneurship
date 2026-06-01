@@ -11,8 +11,16 @@
       </template>
 
       <el-table :data="consultationList" v-loading="loading" stripe>
-        <el-table-column prop="mentorName" label="咨询导师" width="120" />
-        <el-table-column prop="projectTitle" label="关联项目" min-width="200" />
+        <el-table-column label="咨询导师" width="120">
+          <template #default="{ row }">
+            {{ row.mentorName || (row.mentorId ? `导师${row.mentorId}` : '-') }}
+          </template>
+        </el-table-column>
+        <el-table-column label="关联项目" min-width="200">
+          <template #default="{ row }">
+            {{ row.projectTitle || (row.projectId ? `项目${row.projectId}` : '-') }}
+          </template>
+        </el-table-column>
         <el-table-column prop="content" label="咨询内容" min-width="200" show-overflow-tooltip />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
@@ -21,14 +29,14 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="咨询时间" width="160" />
+        <el-table-column prop="createTime" label="咨询时间" width="180" />
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="showDetail(row)">
               详情
             </el-button>
             <el-button
-              v-if="row.status === 'replied'"
+              v-if="row.status === 'completed'"
               type="success"
               link
               size="small"
@@ -94,18 +102,18 @@
     <!-- 咨询详情对话框 -->
     <el-dialog v-model="detailVisible" title="咨询详情" width="600px">
       <el-descriptions :column="1" border>
-        <el-descriptions-item label="导师">{{ currentItem.mentorName }}</el-descriptions-item>
-        <el-descriptions-item label="项目">{{ currentItem.projectTitle }}</el-descriptions-item>
+        <el-descriptions-item label="导师">{{ currentItem.mentorName || (currentItem.mentorId ? `导师${currentItem.mentorId}` : '-') }}</el-descriptions-item>
+        <el-descriptions-item label="项目">{{ currentItem.projectTitle || (currentItem.projectId ? `项目${currentItem.projectId}` : '-') }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="statusType(currentItem.status)" size="small">
             {{ statusLabel(currentItem.status) }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="咨询内容">{{ currentItem.content }}</el-descriptions-item>
-        <el-descriptions-item v-if="currentItem.reply" label="导师回复">
-          {{ currentItem.reply }}
+        <el-descriptions-item v-if="currentItem.notes" label="导师回复">
+          {{ currentItem.notes }}
         </el-descriptions-item>
-        <el-descriptions-item label="咨询时间">{{ currentItem.createdAt }}</el-descriptions-item>
+        <el-descriptions-item label="咨询时间">{{ currentItem.createTime }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
   </div>
@@ -141,12 +149,12 @@ const pagination = reactive({
 })
 
 function statusType(status) {
-  const map = { pending: 'warning', replied: 'success', closed: 'info' }
+  const map = { pending: 'warning', accepted: 'primary', completed: 'success', cancelled: 'info' }
   return map[status] || 'info'
 }
 
 function statusLabel(status) {
-  const map = { pending: '待回复', replied: '已回复', closed: '已关闭' }
+  const map = { pending: '待回复', accepted: '已受理', completed: '已完成', cancelled: '已取消' }
   return map[status] || status
 }
 
@@ -178,7 +186,7 @@ async function fetchList() {
   loading.value = true
   try {
     const res = await getMyConsultations({ page: pagination.page, pageSize: pagination.pageSize })
-    consultationList.value = res.data?.list || res.data || []
+    consultationList.value = res.data?.records || res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
     consultationList.value = []
@@ -196,8 +204,8 @@ onMounted(async () => {
       getMentorList(),
       getMyProjects()
     ])
-    mentors.value = mentorRes.data?.list || mentorRes.data || []
-    myProjects.value = projectRes.data?.list || projectRes.data || []
+    mentors.value = mentorRes.data?.records || mentorRes.data?.list || mentorRes.data || []
+    myProjects.value = projectRes.data?.records || projectRes.data?.list || projectRes.data || []
   } catch {
     mentors.value = []
     myProjects.value = []

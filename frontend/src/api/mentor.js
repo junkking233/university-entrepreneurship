@@ -40,7 +40,7 @@ export function updateConsultationStatus(id, data) {
 
 // 导师培训管理
 export function getMentorTrainings(params) {
-  return request.get('/training/list', { params: normalizeParams(params) })
+  return request.get('/training/mentor/my', { params: normalizeParams(params) })
 }
 
 export function createTraining(data) {

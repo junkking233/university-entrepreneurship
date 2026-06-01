@@ -91,7 +91,8 @@ async function handleLogin() {
       username: form.username,
       password: form.password
     })
-    const { token, user } = res.data
+    const { token } = res.data
+    const user = res.data.user || res.data.userInfo
     localStorage.setItem('token', token)
     localStorage.setItem('userInfo', JSON.stringify(user))
     ElMessage.success('登录成功')

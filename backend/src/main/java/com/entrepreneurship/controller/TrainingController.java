@@ -3,8 +3,10 @@ package com.entrepreneurship.controller;
 import com.entrepreneurship.common.PageResult;
 import com.entrepreneurship.common.Result;
 import com.entrepreneurship.common.SecurityInputUtil;
+import com.entrepreneurship.entity.MentorInfo;
 import com.entrepreneurship.entity.Training;
 import com.entrepreneurship.entity.TrainingRegistration;
+import com.entrepreneurship.service.MentorService;
 import com.entrepreneurship.service.TrainingService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +16,20 @@ import org.springframework.web.bind.annotation.*;
 public class TrainingController {
 
     private final TrainingService trainingService;
+    private final MentorService mentorService;
 
-    public TrainingController(TrainingService trainingService) {
+    public TrainingController(TrainingService trainingService, MentorService mentorService) {
         this.trainingService = trainingService;
+        this.mentorService = mentorService;
     }
 
     @PostMapping
-    public Result<Training> create(@RequestBody Training training) {
+    public Result<Training> create(@RequestBody Training training, HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        MentorInfo mentorInfo = mentorService.getByUserId(userId);
+        if (mentorInfo != null) {
+            training.setMentorId(mentorInfo.getId());
+        }
         SecurityInputUtil.sanitize(training);
         return Result.ok(trainingService.create(training));
     }
@@ -49,11 +58,32 @@ public class TrainingController {
     public Result<PageResult<Training>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String status) {
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword) {
         return Result.ok(trainingService.list(
                 SecurityInputUtil.page(page),
                 SecurityInputUtil.size(size),
-                SecurityInputUtil.cleanStatus(status)));
+                SecurityInputUtil.cleanStatus(status),
+                SecurityInputUtil.cleanText(keyword, 100, "关键词")));
+    }
+
+    @GetMapping("/mentor/my")
+    public Result<PageResult<Training>> listMyMentorTrainings(HttpServletRequest request,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword) {
+        Long userId = (Long) request.getAttribute("userId");
+        MentorInfo mentorInfo = mentorService.getByUserId(userId);
+        if (mentorInfo == null) {
+            return Result.error("不是导师");
+        }
+        return Result.ok(trainingService.listByMentor(
+                mentorInfo.getId(),
+                SecurityInputUtil.page(page),
+                SecurityInputUtil.size(size),
+                SecurityInputUtil.cleanStatus(status),
+                SecurityInputUtil.cleanText(keyword, 100, "关键词")));
     }
 
     @PostMapping("/{trainingId}/register")

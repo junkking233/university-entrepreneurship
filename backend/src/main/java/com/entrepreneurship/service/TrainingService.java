@@ -10,7 +10,8 @@ public interface TrainingService {
     Training update(Long id, Training training);
     void delete(Long id);
     Training getById(Long id);
-    PageResult<Training> list(int page, int size, String status);
+    PageResult<Training> list(int page, int size, String status, String keyword);
+    PageResult<Training> listByMentor(Long mentorId, int page, int size, String status, String keyword);
     TrainingRegistration register(Long trainingId, Long userId);
     void cancelRegistration(Long trainingId, Long userId);
     PageResult<TrainingRegistration> listRegistrations(Long userId, int page, int size);

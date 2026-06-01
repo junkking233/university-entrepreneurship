@@ -73,6 +73,12 @@ const routes = [
         meta: { requiresAuth: true, role: 'student' }
       },
       {
+        path: 'student/profile',
+        name: 'StudentProfile',
+        component: () => import('@/views/StudentProfile.vue'),
+        meta: { requiresAuth: true, role: 'student' }
+      },
+      {
         path: 'mentor/dashboard',
         name: 'MentorDashboard',
         component: () => import('@/views/MentorDashboard.vue'),
@@ -158,10 +164,20 @@ function clearAuth() {
   localStorage.removeItem('userInfo')
 }
 
+function getStoredUserInfo() {
+  try {
+    const raw = localStorage.getItem('userInfo')
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    clearAuth()
+    return null
+  }
+}
+
 // 路由守卫
 router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('token')
-  const userInfo = JSON.parse(localStorage.getItem('userInfo') || 'null')
+  const userInfo = getStoredUserInfo()
 
   if (to.meta.requiresAuth) {
     if (!token) {

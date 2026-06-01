@@ -10,7 +10,7 @@ public interface RoadshowService {
     Roadshow update(Long id, Roadshow roadshow);
     void delete(Long id);
     Roadshow getById(Long id);
-    PageResult<Roadshow> list(int page, int size, String status);
+    PageResult<Roadshow> list(int page, int size, String status, String keyword);
     RoadshowProject addProject(RoadshowProject roadshowProject);
     void removeProject(Long roadshowId, Long projectId);
     PageResult<RoadshowProject> listProjects(Long roadshowId, int page, int size);

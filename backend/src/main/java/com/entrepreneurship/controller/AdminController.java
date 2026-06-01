@@ -1,6 +1,7 @@
 package com.entrepreneurship.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.entrepreneurship.common.PageResult;
 import com.entrepreneurship.common.Result;
 import com.entrepreneurship.common.SecurityInputUtil;
@@ -70,10 +71,24 @@ public class AdminController {
     public Result<PageResult<User>> users(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String role,
             HttpServletRequest request) {
         requireAdmin(request);
         Page<User> userPage = new Page<>(SecurityInputUtil.page(page), SecurityInputUtil.size(size));
-        Page<User> result = userMapper.selectPage(userPage, null);
+        String cleanKeyword = SecurityInputUtil.cleanText(keyword, 100, "关键词");
+        String cleanRole = role == null || role.isBlank() ? null : SecurityInputUtil.cleanRole(role);
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        if (cleanKeyword != null && !cleanKeyword.isEmpty()) {
+            wrapper.and(w -> w.like(User::getUsername, cleanKeyword)
+                    .or().like(User::getName, cleanKeyword)
+                    .or().like(User::getEmail, cleanKeyword));
+        }
+        if (cleanRole != null && !cleanRole.isEmpty()) {
+            wrapper.eq(User::getRole, cleanRole);
+        }
+        wrapper.orderByDesc(User::getCreateTime);
+        Page<User> result = userMapper.selectPage(userPage, wrapper);
         result.getRecords().forEach(user -> user.setPassword(null));
         PageResult<User> pageResult = new PageResult<>();
         pageResult.setTotal(result.getTotal());
@@ -149,9 +164,13 @@ public class AdminController {
     public Result<PageResult<Feedback>> feedbacks(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String status,
             HttpServletRequest request) {
         requireAdmin(request);
-        PageResult<Feedback> result = feedbackService.listAll(SecurityInputUtil.page(page), SecurityInputUtil.size(size), null);
+        PageResult<Feedback> result = feedbackService.listAll(
+                SecurityInputUtil.page(page),
+                SecurityInputUtil.size(size),
+                SecurityInputUtil.cleanStatus(status));
         return Result.ok(result);
     }
 

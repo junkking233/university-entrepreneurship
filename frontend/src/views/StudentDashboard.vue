@@ -89,10 +89,10 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="发布时间" width="160" />
+        <el-table-column prop="createTime" label="发布时间" width="180" />
         <el-table-column label="操作" width="150">
           <template #default="{ row }">
-            <el-button type="primary" link size="small" @click="$router.push(`/student/projects/create?id=${row.id}`)">
+            <el-button type="primary" link size="small" @click="$router.push(`/student/projects/edit/${row.id}`)">
               编辑
             </el-button>
             <el-button type="danger" link size="small" @click="handleDelete(row)">删除</el-button>
@@ -115,12 +115,12 @@
         <el-table-column prop="projectTitle" label="关联项目" min-width="200" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.status === 'replied' ? 'success' : 'warning'" size="small">
-              {{ row.status === 'replied' ? '已回复' : '待回复' }}
+            <el-tag :type="row.status === 'completed' ? 'success' : 'warning'" size="small">
+              {{ row.status === 'completed' ? '已回复' : '待回复' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="咨询时间" width="160" />
+        <el-table-column prop="createTime" label="咨询时间" width="180" />
       </el-table>
       <el-empty v-if="recentConsultations.length === 0" description="暂无咨询记录" />
     </el-card>
@@ -133,7 +133,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { FolderOpened, ChatDotRound, Reading, Star, Plus, Search, EditPen } from '@element-plus/icons-vue'
 import { getMyProjects, deleteProject } from '@/api/project'
 import { getMyConsultations } from '@/api/consultation'
-import { getStatistics } from '@/api/statistics'
+import { getMyTrainings } from '@/api/training'
 
 const stats = reactive({
   projectCount: 0,
@@ -175,32 +175,29 @@ async function handleDelete(row) {
 async function fetchProjects() {
   try {
     const res = await getMyProjects()
-    myProjects.value = res.data?.list || res.data || []
+    myProjects.value = res.data?.records || res.data?.list || res.data || []
   } catch {
     myProjects.value = []
   }
 }
 
 async function fetchStats() {
-  try {
-    const res = await getStatistics()
-    const data = res.data || {}
-    stats.projectCount = data.projectCount || data.myProjectCount || data.totalProjects || 0
-    stats.consultCount = data.consultCount || data.consultationCount || 0
-    stats.trainingCount = data.trainingCount || data.myTrainingCount || 0
-    stats.favoriteCount = data.favoriteCount || data.collectionCount || 0
-  } catch {
-    stats.projectCount = 0
-    stats.consultCount = 0
-    stats.trainingCount = 0
-    stats.favoriteCount = 0
-  }
+  const [projectRes, consultationRes, trainingRes] = await Promise.allSettled([
+    getMyProjects({ page: 1, pageSize: 1 }),
+    getMyConsultations({ page: 1, pageSize: 1 }),
+    getMyTrainings({ page: 1, pageSize: 1 })
+  ])
+
+  stats.projectCount = projectRes.status === 'fulfilled' ? (projectRes.value.data?.total || 0) : 0
+  stats.consultCount = consultationRes.status === 'fulfilled' ? (consultationRes.value.data?.total || 0) : 0
+  stats.trainingCount = trainingRes.status === 'fulfilled' ? (trainingRes.value.data?.total || 0) : 0
+  stats.favoriteCount = 0
 }
 
 async function fetchRecentConsultations() {
   try {
     const res = await getMyConsultations({ page: 1, pageSize: 5 })
-    recentConsultations.value = res.data?.list || res.data || []
+    recentConsultations.value = res.data?.records || res.data?.list || res.data || []
   } catch {
     recentConsultations.value = []
   }

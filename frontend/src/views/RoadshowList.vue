@@ -27,9 +27,13 @@
 
       <el-table :data="roadshowList" v-loading="loading" stripe>
         <el-table-column prop="title" label="路演名称" min-width="250" />
-        <el-table-column prop="time" label="路演时间" width="180" />
+        <el-table-column prop="startTime" label="路演时间" width="180" />
         <el-table-column prop="location" label="地点" width="200" />
-        <el-table-column prop="organizer" label="主办方" width="150" />
+        <el-table-column label="主办方" width="150">
+          <template #default="{ row }">
+            {{ row.organizerName || (row.organizerId ? `用户#${row.organizerId}` : '-') }}
+          </template>
+        </el-table-column>
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="statusType(row.status)" size="small">
@@ -37,7 +41,11 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="projectCount" label="参与项目" width="100" />
+        <el-table-column prop="currentProjects" label="参与项目" width="100">
+          <template #default="{ row }">
+            {{ row.currentProjects || 0 }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <el-button
@@ -48,7 +56,7 @@
             >
               报名参加
             </el-button>
-            <el-button v-else size="small" disabled>已结束</el-button>
+            <el-button v-else size="small" disabled>不可报名</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -88,12 +96,12 @@ const pagination = reactive({
 })
 
 function statusType(status) {
-  const map = { upcoming: 'primary', ongoing: 'success', finished: 'info' }
+  const map = { upcoming: 'primary', ongoing: 'success', completed: 'info' }
   return map[status] || 'info'
 }
 
 function statusLabel(status) {
-  const map = { upcoming: '即将开始', ongoing: '进行中', finished: '已结束' }
+  const map = { upcoming: '即将开始', ongoing: '进行中', completed: '已结束' }
   return map[status] || status
 }
 
@@ -119,7 +127,7 @@ async function fetchList() {
       pageSize: pagination.pageSize,
       keyword: searchKeyword.value
     })
-    roadshowList.value = res.data?.list || res.data || []
+    roadshowList.value = res.data?.records || res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
     roadshowList.value = []

@@ -4,33 +4,47 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.entrepreneurship.common.BusinessException;
 import com.entrepreneurship.common.PageResult;
+import com.entrepreneurship.entity.MentorInfo;
 import com.entrepreneurship.entity.Training;
 import com.entrepreneurship.entity.TrainingRegistration;
+import com.entrepreneurship.entity.User;
+import com.entrepreneurship.mapper.MentorInfoMapper;
 import com.entrepreneurship.mapper.TrainingMapper;
 import com.entrepreneurship.mapper.TrainingRegistrationMapper;
+import com.entrepreneurship.mapper.UserMapper;
 import com.entrepreneurship.service.TrainingService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class TrainingServiceImpl implements TrainingService {
 
     private final TrainingMapper trainingMapper;
     private final TrainingRegistrationMapper trainingRegistrationMapper;
+    private final MentorInfoMapper mentorInfoMapper;
+    private final UserMapper userMapper;
 
-    public TrainingServiceImpl(TrainingMapper trainingMapper, TrainingRegistrationMapper trainingRegistrationMapper) {
+    public TrainingServiceImpl(TrainingMapper trainingMapper,
+                               TrainingRegistrationMapper trainingRegistrationMapper,
+                               MentorInfoMapper mentorInfoMapper,
+                               UserMapper userMapper) {
         this.trainingMapper = trainingMapper;
         this.trainingRegistrationMapper = trainingRegistrationMapper;
+        this.mentorInfoMapper = mentorInfoMapper;
+        this.userMapper = userMapper;
     }
 
     @Override
     public Training create(Training training) {
         training.setCurrentParticipants(0);
-        training.setStatus("active");
+        if (training.getStatus() == null || training.getStatus().isEmpty()) {
+            training.setStatus("upcoming");
+        }
         training.setCreateTime(LocalDateTime.now());
         trainingMapper.insert(training);
-        return training;
+        return enrich(training);
     }
 
     @Override
@@ -47,7 +61,7 @@ public class TrainingServiceImpl implements TrainingService {
             if (training.getStatus() != null) existing.setStatus(training.getStatus());
             if (training.getCoverImage() != null) existing.setCoverImage(training.getCoverImage());
             trainingMapper.updateById(existing);
-            return existing;
+            return enrich(existing);
         }
         return null;
     }
@@ -59,19 +73,36 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     public Training getById(Long id) {
-        return trainingMapper.selectById(id);
+        return enrich(trainingMapper.selectById(id));
     }
 
     @Override
-    public PageResult<Training> list(int page, int size, String status) {
+    public PageResult<Training> list(int page, int size, String status, String keyword) {
+        return listInternal(page, size, status, keyword, null);
+    }
+
+    @Override
+    public PageResult<Training> listByMentor(Long mentorId, int page, int size, String status, String keyword) {
+        return listInternal(page, size, status, keyword, mentorId);
+    }
+
+    private PageResult<Training> listInternal(int page, int size, String status, String keyword, Long mentorId) {
         LambdaQueryWrapper<Training> wrapper = new LambdaQueryWrapper<>();
+        if (mentorId != null) {
+            wrapper.eq(Training::getMentorId, mentorId);
+        }
         if (status != null && !status.isEmpty()) {
             wrapper.eq(Training::getStatus, status);
+        }
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.and(w -> w.like(Training::getTitle, keyword)
+                    .or().like(Training::getDescription, keyword)
+                    .or().like(Training::getLocation, keyword));
         }
         wrapper.orderByDesc(Training::getCreateTime);
         Page<Training> mpPage = new Page<>(page, size);
         Page<Training> result = trainingMapper.selectPage(mpPage, wrapper);
-        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
+        return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), enrich(result.getRecords()));
     }
 
     @Override
@@ -131,5 +162,24 @@ public class TrainingServiceImpl implements TrainingService {
         Page<TrainingRegistration> mpPage = new Page<>(page, size);
         Page<TrainingRegistration> result = trainingRegistrationMapper.selectPage(mpPage, wrapper);
         return new PageResult<>(result.getTotal(), result.getCurrent(), result.getSize(), result.getRecords());
+    }
+
+    private Training enrich(Training training) {
+        if (training == null || training.getMentorId() == null) {
+            return training;
+        }
+        MentorInfo mentor = mentorInfoMapper.selectById(training.getMentorId());
+        if (mentor != null && mentor.getUserId() != null) {
+            User user = userMapper.selectById(mentor.getUserId());
+            if (user != null) {
+                training.setMentorName(user.getName() != null && !user.getName().isEmpty() ? user.getName() : user.getUsername());
+            }
+        }
+        return training;
+    }
+
+    private List<Training> enrich(List<Training> trainings) {
+        trainings.forEach(this::enrich);
+        return trainings;
     }
 }

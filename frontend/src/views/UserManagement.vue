@@ -32,7 +32,7 @@
 
       <el-table :data="userList" v-loading="loading" stripe>
         <el-table-column prop="username" label="用户名" width="150" />
-        <el-table-column prop="nickname" label="昵称" width="150" />
+        <el-table-column prop="name" label="昵称" width="150" />
         <el-table-column prop="email" label="邮箱" width="200" />
         <el-table-column prop="role" label="角色" width="100">
           <template #default="{ row }">
@@ -43,20 +43,20 @@
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.status === 'active' ? 'success' : 'danger'" size="small">
-              {{ row.status === 'active' ? '正常' : '禁用' }}
+            <el-tag :type="isActive(row.status) ? 'success' : 'danger'" size="small">
+              {{ isActive(row.status) ? '正常' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="注册时间" width="160" />
+        <el-table-column prop="createTime" label="注册时间" width="180" />
         <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
             <el-button
-              :type="row.status === 'active' ? 'warning' : 'success'"
+              :type="isActive(row.status) ? 'warning' : 'success'"
               size="small"
               @click="toggleStatus(row)"
             >
-              {{ row.status === 'active' ? '禁用' : '启用' }}
+              {{ isActive(row.status) ? '禁用' : '启用' }}
             </el-button>
             <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
           </template>
@@ -106,8 +106,12 @@ function roleLabel(role) {
   return map[role] || role
 }
 
+function isActive(status) {
+  return status === 1 || status === '1' || status === 'active'
+}
+
 async function toggleStatus(row) {
-  const newStatus = row.status === 'active' ? 'disabled' : 'active'
+  const newStatus = isActive(row.status) ? 'disabled' : 'active'
   const action = newStatus === 'active' ? '启用' : '禁用'
   try {
     await ElMessageBox.confirm(`确定要${action}该用户吗？`, '提示', { type: 'warning' })
@@ -143,7 +147,7 @@ async function fetchList() {
       keyword: searchKeyword.value,
       role: searchRole.value
     })
-    userList.value = res.data?.list || res.data || []
+    userList.value = res.data?.records || res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
     userList.value = []

@@ -10,8 +10,9 @@
         <el-radio-group v-model="filterStatus" @change="fetchList">
           <el-radio-button value="">全部</el-radio-button>
           <el-radio-button value="pending">待确认</el-radio-button>
-          <el-radio-button value="active">进行中</el-radio-button>
+          <el-radio-button value="confirmed">已确认</el-radio-button>
           <el-radio-button value="completed">已完成</el-radio-button>
+          <el-radio-button value="cancelled">已取消</el-radio-button>
         </el-radio-group>
       </div>
 
@@ -28,9 +29,9 @@
             <span class="amount-text">{{ row.amount }}万</span>
           </template>
         </el-table-column>
-        <el-table-column prop="equity" label="占股比例" width="120">
+        <el-table-column prop="createTime" label="创建时间" width="180">
           <template #default="{ row }">
-            {{ row.equity }}%
+            {{ row.createTime || row.investDate || '-' }}
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100">
@@ -40,7 +41,11 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="investDate" label="投资时间" width="160" />
+        <el-table-column prop="investDate" label="确认时间" width="180">
+          <template #default="{ row }">
+            {{ row.status === 'completed' ? (row.investDate || row.createTime || '-') : '-' }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="showDetail(row)">
@@ -68,13 +73,13 @@
       <el-descriptions :column="1" border>
         <el-descriptions-item label="项目名称">{{ currentItem.projectTitle }}</el-descriptions-item>
         <el-descriptions-item label="投资金额">{{ currentItem.amount }}万</el-descriptions-item>
-        <el-descriptions-item label="占股比例">{{ currentItem.equity }}%</el-descriptions-item>
+        <el-descriptions-item label="创建时间">{{ currentItem.createTime || currentItem.investDate || '-' }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="statusType(currentItem.status)" size="small">
             {{ statusLabel(currentItem.status) }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="投资时间">{{ currentItem.investDate }}</el-descriptions-item>
+        <el-descriptions-item label="确认时间">{{ currentItem.status === 'completed' ? (currentItem.investDate || currentItem.createTime || '-') : '-' }}</el-descriptions-item>
         <el-descriptions-item label="备注">{{ currentItem.note || '无' }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -98,12 +103,12 @@ const pagination = reactive({
 })
 
 function statusType(status) {
-  const map = { pending: 'warning', active: 'success', completed: 'info', cancelled: 'danger' }
+  const map = { pending: 'warning', confirmed: 'success', completed: 'info', cancelled: 'danger' }
   return map[status] || 'info'
 }
 
 function statusLabel(status) {
-  const map = { pending: '待确认', active: '进行中', completed: '已完成', cancelled: '已取消' }
+  const map = { pending: '待确认', confirmed: '已确认', completed: '已完成', cancelled: '已取消' }
   return map[status] || status
 }
 
@@ -120,7 +125,7 @@ async function fetchList() {
       pageSize: pagination.pageSize,
       status: filterStatus.value
     })
-    investmentList.value = res.data?.list || res.data || []
+    investmentList.value = res.data?.records || res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
     investmentList.value = []

@@ -37,8 +37,8 @@
           <el-button size="small" @click="$router.push('/register')">注册</el-button>
         </template>
         <template v-else>
-          <el-dropdown @command="handleUserCommand">
-            <span class="user-dropdown">
+          <el-dropdown trigger="click" @command="handleUserCommand">
+            <span class="user-dropdown" tabindex="0">
               <el-avatar :size="32" :icon="UserFilled" />
               <span class="username">{{ userName }}</span>
               <el-icon><ArrowDown /></el-icon>
@@ -75,7 +75,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { UserFilled } from '@element-plus/icons-vue'
 import { getUnreadCount } from '@/api/message'
@@ -103,11 +103,17 @@ const activeMenu = computed(() => {
 
 function loadUserInfo() {
   const token = localStorage.getItem('token')
-  const userInfo = JSON.parse(localStorage.getItem('userInfo') || 'null')
+  let userInfo = null
+  try {
+    userInfo = JSON.parse(localStorage.getItem('userInfo') || 'null')
+  } catch {
+    localStorage.removeItem('token')
+    localStorage.removeItem('userInfo')
+  }
   if (token && userInfo) {
     isLoggedIn.value = true
     userRole.value = userInfo.role || ''
-    userName.value = userInfo.nickname || userInfo.username || '用户'
+    userName.value = userInfo.name || userInfo.nickname || userInfo.username || '用户'
     fetchUnreadCount()
   } else {
     isLoggedIn.value = false
@@ -119,7 +125,7 @@ function loadUserInfo() {
 async function fetchUnreadCount() {
   try {
     const res = await getUnreadCount()
-    unreadCount.value = res.data || 0
+    unreadCount.value = typeof res.data === 'number' ? res.data : (res.data?.count ?? 0)
   } catch {
     unreadCount.value = 0
   }
@@ -142,7 +148,7 @@ function handleUserCommand(command) {
       break
     case 'profile':
       const profileRoutes = {
-        student: '/student/dashboard',
+        student: '/student/profile',
         mentor: '/mentor/profile',
         investor: '/investor/profile'
       }
@@ -162,6 +168,11 @@ function handleUserCommand(command) {
 onMounted(() => {
   loadUserInfo()
 })
+
+watch(
+  () => route.fullPath,
+  () => loadUserInfo()
+)
 </script>
 
 <style scoped>

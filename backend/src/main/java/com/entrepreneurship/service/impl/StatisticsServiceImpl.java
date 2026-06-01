@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.entrepreneurship.entity.Investment;
 import com.entrepreneurship.entity.Project;
 import com.entrepreneurship.entity.User;
+import com.entrepreneurship.entity.Feedback;
+import com.entrepreneurship.mapper.FeedbackMapper;
 import com.entrepreneurship.mapper.InvestmentMapper;
 import com.entrepreneurship.mapper.ProjectMapper;
 import com.entrepreneurship.mapper.UserMapper;
@@ -20,11 +22,13 @@ public class StatisticsServiceImpl implements StatisticsService {
     private final ProjectMapper projectMapper;
     private final UserMapper userMapper;
     private final InvestmentMapper investmentMapper;
+    private final FeedbackMapper feedbackMapper;
 
-    public StatisticsServiceImpl(ProjectMapper projectMapper, UserMapper userMapper, InvestmentMapper investmentMapper) {
+    public StatisticsServiceImpl(ProjectMapper projectMapper, UserMapper userMapper, InvestmentMapper investmentMapper, FeedbackMapper feedbackMapper) {
         this.projectMapper = projectMapper;
         this.userMapper = userMapper;
         this.investmentMapper = investmentMapper;
+        this.feedbackMapper = feedbackMapper;
     }
 
     @Override
@@ -88,12 +92,14 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<Project> projects = projectMapper.selectList(null);
         List<User> users = userMapper.selectList(null);
         List<Investment> investments = investmentMapper.selectList(null);
+        List<Feedback> feedbacks = feedbackMapper.selectList(null);
 
         stats.put("totalProjects", projects.size());
         stats.put("approvedProjects", projects.stream().filter(p -> "approved".equals(p.getStatus())).count());
         stats.put("pendingProjects", projects.stream().filter(p -> "pending".equals(p.getStatus())).count());
         stats.put("totalUsers", users.size());
         stats.put("totalInvestments", investments.size());
+        stats.put("pendingFeedback", feedbacks.stream().filter(f -> "pending".equals(f.getStatus()) || "processing".equals(f.getStatus())).count());
 
         BigDecimal totalAmount = investments.stream()
                 .map(i -> i.getAmount() != null ? i.getAmount() : BigDecimal.ZERO)

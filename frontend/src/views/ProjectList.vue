@@ -33,13 +33,6 @@
               <el-option label="金融科技" value="金融科技" />
             </el-select>
           </el-col>
-          <el-col :span="6">
-            <el-select v-model="searchForm.status" placeholder="项目状态" clearable @change="handleSearch">
-              <el-option label="融资中" value="funding" />
-              <el-option label="已融资" value="funded" />
-              <el-option label="孵化中" value="incubating" />
-            </el-select>
-          </el-col>
           <el-col :span="4">
             <el-button type="primary" @click="handleSearch">
               <el-icon><Search /></el-icon> 搜索
@@ -65,7 +58,7 @@
         <el-table-column prop="founder" label="创始人" width="120" />
         <el-table-column prop="fundingTarget" label="融资金额" width="120">
           <template #default="{ row }">
-            <span class="funding-amount">{{ row.fundingTarget }}万</span>
+            <span class="funding-amount">{{ row.fundingTarget ? `${row.fundingTarget}万` : '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100">
@@ -75,7 +68,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="发布时间" width="160" />
+        <el-table-column prop="createTime" label="发布时间" width="180" />
         <el-table-column label="操作" width="100" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="$router.push(`/projects/${row.id}`)">
@@ -107,15 +100,14 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { Search } from '@element-plus/icons-vue'
-import { getProjectList } from '@/api/project'
+import { getPublicProjectList } from '@/api/project'
 
 const loading = ref(false)
 const projectList = ref([])
 
 const searchForm = reactive({
   keyword: '',
-  category: '',
-  status: ''
+  category: ''
 })
 
 const pagination = reactive({
@@ -125,24 +117,24 @@ const pagination = reactive({
 })
 
 function statusType(status) {
-  const map = { funding: 'primary', funded: 'success', incubating: 'warning' }
+  const map = { funding: 'primary', funded: 'success', incubating: 'warning', pending: 'warning', approved: 'success', rejected: 'danger', closed: 'info' }
   return map[status] || 'info'
 }
 
 function statusLabel(status) {
-  const map = { funding: '融资中', funded: '已融资', incubating: '孵化中' }
+  const map = { funding: '融资中', funded: '已融资', incubating: '孵化中', pending: '审核中', approved: '已通过', rejected: '已驳回', closed: '已关闭' }
   return map[status] || status
 }
 
 async function fetchProjects() {
   loading.value = true
   try {
-    const res = await getProjectList({
+    const res = await getPublicProjectList({
       page: pagination.page,
       pageSize: pagination.pageSize,
       ...searchForm
     })
-    projectList.value = res.data?.list || res.data || []
+    projectList.value = res.data?.records || res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
     projectList.value = []

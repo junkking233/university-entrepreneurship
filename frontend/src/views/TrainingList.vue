@@ -26,7 +26,7 @@
             <el-select v-model="searchStatus" placeholder="状态筛选" clearable @change="fetchList">
               <el-option label="即将开始" value="upcoming" />
               <el-option label="进行中" value="ongoing" />
-              <el-option label="已结束" value="finished" />
+              <el-option label="已结束" value="completed" />
             </el-select>
           </el-col>
         </el-row>
@@ -34,8 +34,8 @@
 
       <el-table :data="trainingList" v-loading="loading" stripe>
         <el-table-column prop="title" label="活动名称" min-width="200" />
-        <el-table-column prop="speaker" label="主讲人" width="150" />
-        <el-table-column prop="time" label="活动时间" width="180" />
+        <el-table-column prop="instructor" label="主讲人" width="150" />
+        <el-table-column prop="startTime" label="活动时间" width="180" />
         <el-table-column prop="location" label="地点" width="180" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
@@ -46,13 +46,13 @@
         </el-table-column>
         <el-table-column prop="enrolled" label="报名人数" width="100">
           <template #default="{ row }">
-            {{ row.enrolled }}/{{ row.capacity }}
+            {{ row.currentParticipants || 0 }}/{{ row.maxParticipants || 0 }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <el-button
-              v-if="row.status !== 'finished'"
+              v-if="row.status !== 'completed'"
               type="primary"
               size="small"
               @click="handleEnroll(row)"
@@ -100,12 +100,12 @@ const pagination = reactive({
 })
 
 function statusType(status) {
-  const map = { upcoming: 'primary', ongoing: 'success', finished: 'info' }
+  const map = { upcoming: 'primary', ongoing: 'success', completed: 'info' }
   return map[status] || 'info'
 }
 
 function statusLabel(status) {
-  const map = { upcoming: '即将开始', ongoing: '进行中', finished: '已结束' }
+  const map = { upcoming: '即将开始', ongoing: '进行中', completed: '已结束' }
   return map[status] || status
 }
 
@@ -133,7 +133,7 @@ async function fetchList() {
       keyword: searchKeyword.value,
       status: searchStatus.value
     })
-    trainingList.value = res.data?.list || res.data || []
+    trainingList.value = res.data?.records || res.data?.list || res.data || []
     pagination.total = res.data?.total || 0
   } catch {
     trainingList.value = []

@@ -92,7 +92,7 @@
             <p class="project-desc">{{ item.description }}</p>
             <div class="project-meta">
               <el-tag size="small">{{ item.category }}</el-tag>
-              <span class="funding">{{ item.fundingTarget }}万</span>
+              <span class="funding">{{ item.fundingTarget ? `${item.fundingTarget}万` : '-' }}</span>
             </div>
           </el-card>
         </el-col>
@@ -120,12 +120,12 @@ const recentInvestments = ref([])
 const recommendedProjects = ref([])
 
 function statusType(status) {
-  const map = { active: 'success', pending: 'warning', completed: 'info' }
+  const map = { pending: 'warning', confirmed: 'success', completed: 'info', cancelled: 'danger' }
   return map[status] || 'info'
 }
 
 function statusLabel(status) {
-  const map = { active: '进行中', pending: '待确认', completed: '已完成' }
+  const map = { pending: '待确认', confirmed: '已确认', completed: '已完成', cancelled: '已取消' }
   return map[status] || status
 }
 

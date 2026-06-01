@@ -22,6 +22,10 @@ public class Project {
     @TableField("team_info")
     private String teamInfo;
     private String category;
+    @TableField("funding_target")
+    private BigDecimal fundingTarget;
+    @TableField("team_size")
+    private Integer teamSize;
     private String status;
     private Integer views;
     private BigDecimal rating;
@@ -31,6 +35,8 @@ public class Project {
     private LocalDateTime createTime;
     @TableField("update_time")
     private LocalDateTime updateTime;
+    @TableField(exist = false)
+    private String founder;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -46,6 +52,10 @@ public class Project {
     public void setTeamInfo(String teamInfo) { this.teamInfo = teamInfo; }
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+    public BigDecimal getFundingTarget() { return fundingTarget; }
+    public void setFundingTarget(BigDecimal fundingTarget) { this.fundingTarget = fundingTarget; }
+    public Integer getTeamSize() { return teamSize; }
+    public void setTeamSize(Integer teamSize) { this.teamSize = teamSize; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public Integer getViews() { return views; }
@@ -58,4 +68,6 @@ public class Project {
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
     public LocalDateTime getUpdateTime() { return updateTime; }
     public void setUpdateTime(LocalDateTime updateTime) { this.updateTime = updateTime; }
+    public String getFounder() { return founder; }
+    public void setFounder(String founder) { this.founder = founder; }
 }

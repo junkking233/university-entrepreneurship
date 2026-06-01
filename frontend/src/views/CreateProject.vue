@@ -77,9 +77,9 @@
           />
         </el-form-item>
 
-        <el-form-item label="团队介绍" prop="teamIntro">
+        <el-form-item label="团队介绍" prop="teamInfo">
           <el-input
-            v-model="form.teamIntro"
+            v-model="form.teamInfo"
             type="textarea"
             :rows="4"
             placeholder="请介绍团队成员及各自的优势和分工"
@@ -120,7 +120,7 @@ const form = reactive({
   teamSize: 3,
   description: '',
   businessPlan: '',
-  teamIntro: ''
+  teamInfo: ''
 })
 
 const rules = {
@@ -174,6 +174,9 @@ async function loadProject() {
   try {
     const res = await getProjectDetail(route.params.id)
     Object.assign(form, res.data)
+    if (res.data?.teamInfo) {
+      form.teamInfo = res.data.teamInfo
+    }
   } catch {
     ElMessage.error('加载项目信息失败')
   }

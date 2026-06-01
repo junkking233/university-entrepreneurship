@@ -59,9 +59,13 @@
         </div>
       </template>
       <el-table :data="pendingConsultations" stripe>
-        <el-table-column prop="studentName" label="学生" width="120" />
+        <el-table-column label="学生" width="120">
+          <template #default="{ row }">
+            {{ row.studentName || (row.studentId ? `学生${row.studentId}` : '-') }}
+          </template>
+        </el-table-column>
         <el-table-column prop="content" label="咨询内容" min-width="250" show-overflow-tooltip />
-        <el-table-column prop="createdAt" label="咨询时间" width="160" />
+        <el-table-column prop="createTime" label="咨询时间" width="180" />
         <el-table-column label="操作" width="120">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="openReply(row)">回复</el-button>
@@ -81,11 +85,11 @@
       </template>
       <el-table :data="myTrainings" stripe>
         <el-table-column prop="title" label="活动名称" min-width="200" />
-        <el-table-column prop="time" label="活动时间" width="180" />
+        <el-table-column prop="startTime" label="活动时间" width="180" />
         <el-table-column prop="location" label="地点" width="180" />
         <el-table-column label="报名" width="80">
           <template #default="{ row }">
-            {{ row.enrolled }}/{{ row.capacity }}
+            {{ row.currentParticipants || 0 }}/{{ row.maxParticipants || 0 }}
           </template>
         </el-table-column>
       </el-table>
@@ -152,7 +156,7 @@ async function submitReply() {
   try {
     await updateConsultationStatus(currentConsult.value.id, {
       reply: replyForm.reply,
-      status: 'replied'
+      status: 'completed'
     })
     ElMessage.success('回复成功')
     replyVisible.value = false
@@ -168,9 +172,10 @@ async function fetchData() {
       getMentorConsultations({ status: 'pending' }),
       getMentorTrainings()
     ])
-    pendingConsultations.value = consultRes.data?.list || consultRes.data || []
-    myTrainings.value = trainingRes.data?.list || trainingRes.data || []
-    stats.pendingConsult = consultRes.data?.total || pendingConsultations.value.length
+    const consultations = consultRes.data?.records || consultRes.data?.list || consultRes.data || []
+    pendingConsultations.value = consultations.filter((item) => item.status === 'pending')
+    myTrainings.value = trainingRes.data?.records || trainingRes.data?.list || trainingRes.data || []
+    stats.pendingConsult = pendingConsultations.value.length
     stats.trainingCount = trainingRes.data?.total || myTrainings.value.length
     stats.studentCount = pendingConsultations.value.length
   } catch {

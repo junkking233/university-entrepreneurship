@@ -20,7 +20,7 @@ public final class SecurityInputUtil {
     private static final Set<String> ROLES = new HashSet<>(Arrays.asList("student", "mentor", "investor", "admin"));
     private static final Set<String> STATUSES = new HashSet<>(Arrays.asList(
             "pending", "approved", "rejected", "active", "inactive", "completed",
-            "registered", "cancelled", "replied", "processed", "processing", "resolved",
+            "confirmed", "registered", "cancelled", "replied", "processed", "processing", "resolved",
             "closed", "read", "unread", "upcoming", "ongoing", "finished",
             "funding", "funded", "incubating", "draft", "disabled"
     ));
@@ -165,6 +165,7 @@ public final class SecurityInputUtil {
         dto.setEmail(cleanEmail(dto.getEmail()));
         dto.setPhone(cleanPhone(dto.getPhone()));
         dto.setRole(cleanRole(dto.getRole()));
+        dto.setCompany(cleanText(dto.getCompany(), 120, "投资机构"));
     }
 
     public static void sanitize(ProjectDTO dto) {
@@ -176,6 +177,10 @@ public final class SecurityInputUtil {
         dto.setCategory(cleanText(dto.getCategory(), 50, "项目分类"));
         dto.setTeamInfo(cleanText(dto.getTeamInfo(), 2000, "团队信息"));
         dto.setBusinessPlan(cleanText(dto.getBusinessPlan(), 5000, "商业计划"));
+        if (dto.getFundingTarget() != null) dto.setFundingTarget(positiveAmount(dto.getFundingTarget(), "融资金额"));
+        if (dto.getTeamSize() != null && (dto.getTeamSize() < 1 || dto.getTeamSize() > 1000)) {
+            throw new BusinessException(400, "团队规模必须为1-1000");
+        }
     }
 
     public static void sanitizeOptional(ProjectDTO dto) {
@@ -187,6 +192,10 @@ public final class SecurityInputUtil {
         dto.setCategory(cleanText(dto.getCategory(), 50, "项目分类"));
         dto.setTeamInfo(cleanText(dto.getTeamInfo(), 2000, "团队信息"));
         dto.setBusinessPlan(cleanText(dto.getBusinessPlan(), 5000, "商业计划"));
+        if (dto.getFundingTarget() != null) dto.setFundingTarget(positiveAmount(dto.getFundingTarget(), "融资金额"));
+        if (dto.getTeamSize() != null && (dto.getTeamSize() < 1 || dto.getTeamSize() > 1000)) {
+            throw new BusinessException(400, "团队规模必须为1-1000");
+        }
     }
 
     public static void sanitize(User user) {
@@ -214,6 +223,7 @@ public final class SecurityInputUtil {
         info.setCompany(cleanText(info.getCompany(), 120, "公司"));
         info.setPosition(cleanText(info.getPosition(), 80, "职位"));
         info.setInvestmentField(cleanText(info.getInvestmentField(), 500, "投资领域"));
+        info.setBudget(cleanText(info.getBudget(), 100, "投资预算"));
         info.setBio(cleanText(info.getBio(), 2000, "简介"));
         info.setAvatar(cleanUrl(info.getAvatar(), 500, "头像"));
     }
@@ -221,6 +231,7 @@ public final class SecurityInputUtil {
     public static void sanitize(Feedback feedback) {
         if (feedback == null) throw new BusinessException(400, "反馈参数不能为空");
         feedback.setType(cleanText(feedback.getType(), 50, "反馈类型"));
+        feedback.setTitle(cleanText(feedback.getTitle(), 200, "反馈标题"));
         feedback.setContent(requireText(feedback.getContent(), 2000, "反馈内容"));
         feedback.setStatus(cleanStatus(feedback.getStatus()));
         feedback.setReply(cleanText(feedback.getReply(), 2000, "回复内容"));
@@ -235,13 +246,10 @@ public final class SecurityInputUtil {
     public static void sanitize(Consultation consultation) {
         if (consultation == null) throw new BusinessException(400, "咨询参数不能为空");
         requirePositiveId(consultation.getMentorId(), "导师");
-        consultation.setTopic(requireText(consultation.getTopic(), 100, "咨询主题"));
-        consultation.setDescription(cleanText(consultation.getDescription(), 2000, "咨询描述"));
+        consultation.setTopic(cleanText(consultation.getTopic(), 100, "咨询主题"));
+        consultation.setContent(requireText(consultation.getContent(), 2000, "咨询内容"));
         consultation.setStatus(cleanStatus(consultation.getStatus()));
-        consultation.setFeedback(cleanText(consultation.getFeedback(), 2000, "反馈内容"));
-        if (consultation.getRating() != null && (consultation.getRating() < 1 || consultation.getRating() > 5)) {
-            throw new BusinessException(400, "评分必须为1-5");
-        }
+        consultation.setNotes(cleanText(consultation.getNotes(), 2000, "备注"));
     }
 
     public static void sanitizeConsultationOptional(Consultation consultation) {
@@ -249,12 +257,9 @@ public final class SecurityInputUtil {
         if (consultation.getMentorId() != null) requirePositiveId(consultation.getMentorId(), "导师");
         if (consultation.getProjectId() != null) requirePositiveId(consultation.getProjectId(), "项目");
         if (consultation.getTopic() != null) consultation.setTopic(requireText(consultation.getTopic(), 100, "咨询主题"));
-        consultation.setDescription(cleanText(consultation.getDescription(), 2000, "咨询描述"));
+        consultation.setContent(cleanText(consultation.getContent(), 2000, "咨询内容"));
         consultation.setStatus(cleanStatus(consultation.getStatus()));
-        consultation.setFeedback(cleanText(consultation.getFeedback(), 2000, "反馈内容"));
-        if (consultation.getRating() != null && (consultation.getRating() < 1 || consultation.getRating() > 5)) {
-            throw new BusinessException(400, "评分必须为1-5");
-        }
+        consultation.setNotes(cleanText(consultation.getNotes(), 2000, "备注"));
     }
 
     public static void sanitize(Training training) {

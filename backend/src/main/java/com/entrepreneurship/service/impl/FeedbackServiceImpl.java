@@ -57,9 +57,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     public void reply(Long id, String reply) {
         Feedback feedback = feedbackMapper.selectById(id);
         if (feedback != null) {
-            feedback.setReply(reply);
-            feedback.setStatus("replied");
-            feedback.setUpdateTime(LocalDateTime.now());
+            feedback.setStatus("resolved");
             feedbackMapper.updateById(feedback);
         }
     }
@@ -69,7 +67,6 @@ public class FeedbackServiceImpl implements FeedbackService {
         Feedback feedback = feedbackMapper.selectById(id);
         if (feedback != null) {
             feedback.setStatus(status);
-            feedback.setUpdateTime(LocalDateTime.now());
             feedbackMapper.updateById(feedback);
         }
     }
